@@ -1,16 +1,13 @@
+// components/features/AddressSelector.tsx
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
 import { styled } from 'nativewind';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { CustomerStackParamList } from '../../navigation/types';
 import { useGetAddressesQuery } from '../../store/api/addressApi';
 import { Address } from '../../types/restaurant';
-import Button from '../UI/Button';
-import Modal from '../UI/Modal';
-
-type AddressSelectorNavigationProp = StackNavigationProp<CustomerStackParamList, 'Checkout'>;
+import Button from '../ui/Button';
+import Modal from '../ui/Modal';
 
 interface AddressSelectorProps {
   selectedAddressId: number | null;
@@ -18,7 +15,6 @@ interface AddressSelectorProps {
 }
 
 const AddressSelector = ({ selectedAddressId, onSelectAddress }: AddressSelectorProps) => {
-  const navigation = useNavigation<AddressSelectorNavigationProp>();
   const [modalVisible, setModalVisible] = useState(false);
   
   const { data: addresses, isLoading } = useGetAddressesQuery();
@@ -27,7 +23,7 @@ const AddressSelector = ({ selectedAddressId, onSelectAddress }: AddressSelector
 
   const handleAddNewAddress = () => {
     setModalVisible(false);
-    navigation.navigate('AddEditAddress');
+    router.push('/add-edit-address' as never);
   };
 
   const handleSelectAddress = (address: Address) => {

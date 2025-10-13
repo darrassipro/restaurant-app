@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { RefreshControl, ScrollView, Text, View } from 'react-native';
-import RecentOrders from '../../components/Admin/RecentOrders';
-import SalesChart from '../../components/Admin/SalesChart';
-import StatsCard from '../../components/Admin/StatsCard';
-import { useGetDishesQuery } from '../../store/api/dishApi';
-import { useGetOrdersQuery } from '../../store/api/orderApi';
-import { useGetRestaurantQuery } from '../../store/api/restaurantApi';
-import { useGetUsersQuery } from '../../store/api/userApi';
+import RecentOrders from '../../../components/Admin/RecentOrders';
+import SalesChart from '../../../components/Admin/SalesChart';
+import StatsCard from '../../../components/Admin/StatsCard';
+import { useGetDishesQuery } from '../../../store/api/dishApi';
+import { useGetOrdersQuery } from '../../../store/api/orderApi';
+import { useGetRestaurantQuery } from '../../../store/api/restaurantApi';
+import { useGetUsersQuery } from '../../../store/api/userApi';
 
 const DashboardScreen = () => {
   const [refreshing, setRefreshing] = useState(false);

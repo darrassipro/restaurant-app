@@ -1,4 +1,7 @@
 // app/(admin)/users/[id].tsx
+import { Picker } from '@react-native-picker/picker';
+import { User } from '../../../types/auth';
+
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Switch, Text, View } from 'react-native';
@@ -15,16 +18,25 @@ export default function UserFormScreen() {
   const isEditing = id !== 'new';
   const userId = isEditing && typeof id === 'string' ? parseInt(id) : 0;
   
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    role: 'customer',
-    password: '',
-    confirmPassword: '',
-    isActive: true
-  });
+const [formData, setFormData] = useState<{
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: User['role'];   
+  password: string;
+  confirmPassword: string;
+  isActive: boolean;
+}>({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  role: 'customer',
+  password: '',
+  confirmPassword: '',
+  isActive: true,
+});
   
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   

@@ -5,7 +5,7 @@ import React from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Button from '../../../components/ui/Button';
 import { useGetOrderByIdQuery, useUpdateOrderStatusMutation } from '../../../store/api/orderApi';
-import { ORDER_STATUS } from '../../../utils/constants';
+import { ORDER_STATUS, OrderStatus } from '../../../utils/constants';
 import { formatCurrency, formatDate, formatPhoneNumber } from '../../../utils/formatters';
 
 export default function OrderDetailsScreen() {
@@ -17,13 +17,9 @@ export default function OrderDetailsScreen() {
   
   const order = orderData?.data;
 
-  const getStatusColor = (status: string) => {
-    return ORDER_STATUS[status]?.color || '#666';
-  };
+const getStatusColor = (status: OrderStatus) => ORDER_STATUS[status].color;
 
-  const getStatusLabel = (status: string) => {
-    return ORDER_STATUS[status]?.label || status;
-  };
+  const getStatusLabel = (status: OrderStatus) => ORDER_STATUS[status]?.label || status;
 
   const handleUpdateStatus = async (newStatus: 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled') => {
     try {

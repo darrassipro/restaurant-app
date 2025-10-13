@@ -1,3 +1,4 @@
+// components/features/DishCard.tsx
 import { Feather } from '@expo/vector-icons';
 import { styled } from 'nativewind';
 import React from 'react';
@@ -17,6 +18,9 @@ interface DishCardProps {
   isSpicy?: boolean;
   horizontal?: boolean;
   onPress?: () => void;
+  restaurantId: number;
+  categoryId: number;
+  nameAr: string;
 }
 
 const DishCard = ({
@@ -31,18 +35,24 @@ const DishCard = ({
   isSpicy = false,
   horizontal = false,
   onPress,
+  restaurantId,
+  categoryId,
+  nameAr,
 }: DishCardProps) => {
   const dispatch = useDispatch();
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = (e: any) => {
     e.stopPropagation();
     dispatch(
       addToCart({
         dish: {
           id,
           nameFr: name,
+          nameAr,
           price: price.replace(' MAD', ''),
           image: [image],
+          restaurantId,
+          categoryId,
         },
         quantity: 1,
       })
@@ -134,7 +144,8 @@ const DishCard = ({
               <Text className="text-xs ml-1">{rating}</Text>
             </View>
           )}
-          {isVegetarian && <Feather name="leaf" size={12} color="green" className="mr-1" />}
+          {/* Changed from "leaf" to "circle" with green color to represent vegetarian */}
+          {isVegetarian && <Feather name="circle" size={12} color="green" />}
           {isSpicy && <Feather name="thermometer" size={12} color="red" />}
         </View>
         

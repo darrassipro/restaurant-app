@@ -1,14 +1,14 @@
+// app/screens/Admin/UsersScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import UserTable from '../../components/Admin/UserTable';
-import Button from '../../components/UI/Button';
-import { useDeleteUserMutation, useGetUsersQuery } from '../../store/api/userApi';
-import { ROLES } from '../../utils/constants';
+import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import UserTable from '../../../components/Admin/UserTable';
+import Button from '../../../components/ui/Button';
+import { useDeleteUserMutation, useGetUsersQuery } from '../../../store/api/userApi';
+import { ROLES } from '../../../utils/constants';
 
-const UsersScreen = () => {
-  const navigation = useNavigation();
+export default function UsersScreen() {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string | null>(null);
@@ -34,11 +34,11 @@ const UsersScreen = () => {
   });
 
   const handleAddUser = () => {
-    navigation.navigate('UserForm');
+    router.push('/(admin)/users/new' as never);
   };
 
   const handleEditUser = (userId: number) => {
-    navigation.navigate('UserForm', { userId });
+    router.push(`/(admin)/users/${userId}` as never);
   };
 
   const handleDeleteUser = (userId: number) => {
@@ -173,6 +173,4 @@ const UsersScreen = () => {
       )}
     </View>
   );
-};
-
-export default UsersScreen;
+}

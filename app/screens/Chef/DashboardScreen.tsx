@@ -1,22 +1,19 @@
+// app/screens/Chef/DashboardScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import React from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { ActivityIndicator, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import ChefStats from '../../components/Chef/ChefStats';
-import { ChefStackParamList } from '../../navigation/types';
-import { useGetRestaurantOrdersQuery } from '../../store/api/orderApi';
-import { selectUser } from '../../store/slices/authSlice';
-import { formatCurrency } from '../../utils/formatters';
+import ChefStats from '../../../components/Chef/ChefStats';
+import { useGetRestaurantOrdersQuery } from '../../../store/api/orderApi';
+import { selectUser } from '../../../store/slices/authSlice';
+import { formatCurrency } from '../../../utils/formatters';
 
-type DashboardScreenNavigationProp = StackNavigationProp<ChefStackParamList, 'Dashboard'>;
-
-const DashboardScreen = () => {
-  const navigation = useNavigation<DashboardScreenNavigationProp>();
+export default function DashboardScreen() {
+  const [refreshing, setRefreshing] = useState(false);
   const user = useSelector(selectUser);
   
-  const { data: ordersData, isLoading } = useGetRestaurantOrdersQuery();
+  const { data: ordersData, isLoading, refetch } = useGetRestaurantOrdersQuery();
   const orders = ordersData?.data || [];
 
   // Filter orders by status
@@ -24,16 +21,27 @@ const DashboardScreen = () => {
   const preparingOrders = orders.filter(order => order.status === 'preparing');
   const readyOrders = orders.filter(order => order.status === 'ready');
 
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
+
   const navigateToKitchen = () => {
-    navigation.navigate('KitchenTab');
+    router.push('/(chef)/kitchen');
   };
 
   const navigateToOrder = (orderId: number) => {
-    navigation.navigate('OrderDetails', { orderId });
+    router.push(`/(chef)/order-details/${orderId}`);
   };
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView 
+      className="flex-1 bg-gray-50"
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View className="p-4">
         {/* Welcome Message */}
         <View className="mb-6">
@@ -154,6 +162,4 @@ const DashboardScreen = () => {
       </View>
     </ScrollView>
   );
-};
-
-export default DashboardScreen;
+}

@@ -1,12 +1,11 @@
+// app/screens/Customer/CartScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
 import React from 'react';
 import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import Button from '../../components/UI/Button';
-import { CustomerStackParamList } from '../../navigation/types';
-import { useGetRestaurantQuery } from '../../store/api/restaurantApi';
+import Button from '../../../components/ui/Button';
+import { useGetRestaurantQuery } from '../../../store/api/restaurantApi';
 import {
     clearCart,
     removeFromCart,
@@ -16,13 +15,10 @@ import {
     selectGrandTotal,
     selectTaxAmount,
     updateQuantity
-} from '../../store/slices/cartSlice';
-import { formatCurrency } from '../../utils/formatters';
+} from '../../../store/slices/cartSlice';
+import { formatCurrency } from '../../../utils/formatters';
 
-type CartScreenNavigationProp = StackNavigationProp<CustomerStackParamList, 'Cart'>;
-
-const CartScreen = () => {
-  const navigation = useNavigation<CartScreenNavigationProp>();
+export default function CartScreen() {
   const dispatch = useDispatch();
   
   const cartItems = useSelector(selectCartItems);
@@ -90,7 +86,7 @@ const CartScreen = () => {
       return;
     }
     
-    navigation.navigate('Checkout');
+    router.push('/(customer)/checkout' as never);
   };
 
   return (
@@ -202,13 +198,11 @@ const CartScreen = () => {
           </Text>
           <Button
             title="Voir le menu"
-            onPress={() => navigation.navigate('MenuTab')}
+            onPress={() => router.push('/(customer)/menu' as never)}
             variant="primary"
           />
         </View>
       )}
     </View>
   );
-};
-
-export default CartScreen;
+}
