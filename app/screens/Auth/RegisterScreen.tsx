@@ -1,4 +1,5 @@
 // app/screens/Auth/RegisterScreen.tsx
+import { RegisterRequest } from '@/types/auth';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -8,15 +9,7 @@ import Input from '../../../components/ui/Input';
 import { useRegisterMutation } from '../../../store/api/authApi';
 import { setOtpVerification } from '../../../store/slices/authSlice';
 
-// Define RegisterRequest type to match API expectations
-interface RegisterRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  password: string;
-  role?: string; // Making role optional as it might have a default value
-}
+
 
 export default function RegisterScreen() {
   const dispatch = useDispatch();

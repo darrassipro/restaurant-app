@@ -57,7 +57,7 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
                   <View className="flex-row items-center">
                     <View
                       className="w-2 h-2 rounded-full mr-1"
-                      style={{ backgroundColor: getStatusColor(order.status) }}
+                      
                     />
                     <Text className="text-gray-600 text-sm">
                       {ORDER_STATUS[order.status]?.label || order.status}

@@ -6,7 +6,8 @@ import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 interface InputProps {
   label?: string;
   placeholder?: string;
-  value: string;
+  value?: string;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   onChangeText?: (text: string) => void;
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad' | 'number-pad';
@@ -22,6 +23,7 @@ const Input = ({
   label,
   placeholder,
   value,
+  autoCapitalize,
   onChangeText,
   secureTextEntry = false,
   keyboardType = 'default',
