@@ -1,23 +1,31 @@
 // app/(chef)/_layout.tsx
 import { Feather } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { router, Tabs } from 'expo-router';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../store/slices/authSlice';
 
+// Remove any dynamic styling - use fixed Tailwind classes
 export default function ChefLayout() {
+  const user = useSelector(selectUser);
+
+  // Redirect if not chef
+  useEffect(() => {
+    if (user && user.role !== 'chef') {
+      router.replace('/login' as never);
+    }
+  }, [user]);
+
   return (
     <Tabs
-      screenOptions={({ route }) => ({
+      screenOptions={{
         tabBarActiveTintColor: '#FF5733',
-        tabBarInactiveTintColor: 'gray',
-      })}
+        headerStyle: {
+          backgroundColor: '#FF5733',
+        },
+        headerTintColor: '#fff',
+      }}
     >
-      <Tabs.Screen
-        name="dashboard"
-        options={{
-          title: 'Accueil',
-          tabBarIcon: ({ color }) => <Feather name="home" size={24} color={color} />,
-        }}
-      />
       <Tabs.Screen
         name="kitchen"
         options={{
@@ -26,17 +34,25 @@ export default function ChefLayout() {
         }}
       />
       <Tabs.Screen
-        name="history"
+        name="orders"
         options={{
-          title: 'Historique',
-          tabBarIcon: ({ color }) => <Feather name="clock" size={24} color={color} />,
+          title: 'Commandes',
+          tabBarIcon: ({ color }) => <Feather name="list" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="profile"
         options={{
-          title: 'Paramètres',
-          tabBarIcon: ({ color }) => <Feather name="settings" size={24} color={color} />,
+          title: 'Profil',
+          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
+        }}
+      />
+      {/* Hide this screen from the tab bar */}
+      <Tabs.Screen
+        name="order-details/[id]"
+        options={{
+          href: null,
+          title: 'Détails de commande',
         }}
       />
     </Tabs>

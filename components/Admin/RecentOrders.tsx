@@ -1,7 +1,6 @@
 // src/components/Admin/RecentOrders.tsx
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Order } from '../../types/order';
@@ -16,15 +15,15 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
   const navigation = useNavigation();
 
   const navigateToOrderDetails = (orderId: number) => {
-   // navigation.navigate('OrderDetails', { orderId });
+    // navigation.navigate('OrderDetails', { orderId });
   };
 
   const navigateToAllOrders = () => {
-  //  navigation.navigate('OrdersDrawer');
+    // navigation.navigate('OrdersDrawer');
   };
 
   const getStatusColor = (status: string) => {
-   // return ORDER_STATUS[status]?.color || '#666';
+    // return ORDER_STATUS[status]?.color || '#666';
   };
 
   return (
@@ -35,7 +34,7 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
           <Text className="text-primary">Voir tout</Text>
         </TouchableOpacity>
       </View>
-      
+
       {orders.length > 0 ? (
         <>
           {orders.map((order) => (
@@ -51,13 +50,15 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
                     {order.User?.firstName} {order.User?.lastName}
                   </Text>
                 </View>
-                
+
                 <View className="items-end">
-                  <Text className="font-bold text-primary">{formatCurrency(order.total)}</Text>
+                  <Text className="font-bold text-primary">
+                    {formatCurrency(order.total)}
+                  </Text>
                   <View className="flex-row items-center">
                     <View
                       className="w-2 h-2 rounded-full mr-1"
-                      
+                      // style={{ backgroundColor: getStatusColor(order.status) }}
                     />
                     <Text className="text-gray-600 text-sm">
                       {ORDER_STATUS[order.status]?.label || order.status}
@@ -65,7 +66,7 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
                   </View>
                 </View>
               </View>
-              
+
               <Text className="text-gray-500 text-sm mt-1">
                 {formatDate(order.createdAt)}
               </Text>
@@ -82,4 +83,4 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
   );
 };
 
-export default styled(RecentOrders);
+export default RecentOrders;

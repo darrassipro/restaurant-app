@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import { Provider, useDispatch, useSelector } from 'react-redux';
+import '../global.css';
 import { store } from '../store';
 import { useGetCurrentUserQuery } from '../store/api/authApi';
 import { selectIsAuthenticated, selectIsLoading, selectUser, setLoading } from '../store/slices/authSlice';

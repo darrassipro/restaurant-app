@@ -1,5 +1,4 @@
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -72,4 +71,4 @@ const Input = ({
   );
 };
 
-export default styled(Input);
+export default Input;
