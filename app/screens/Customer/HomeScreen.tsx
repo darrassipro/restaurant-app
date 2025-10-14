@@ -1,20 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, RefreshControl } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+// app/screens/Customer/HomeScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { useGetRestaurantQuery } from '../../store/api/restaurantApi';
-import { useGetCategoriesQuery } from '../../store/api/categoryApi';
-import { CustomerStackParamList } from '../../navigation/types';
-import Card from '../../components/UI/Card';
-import DishCard from '../../components/features/DishCard';
-import { formatCurrency } from '../../utils/formatters';
-import { useGetDishesQuery } from '../../store/api/dishApi';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import DishCard from '../../../components/features/DishCard';
+import Card from '../../../components/ui/Card';
+import { useGetCategoriesQuery } from '../../../store/api/categoryApi';
+import { useGetDishesQuery } from '../../../store/api/dishApi';
+import { useGetRestaurantQuery } from '../../../store/api/restaurantApi';
+import { formatCurrency } from '../../../utils/formatters';
 
-type HomeScreenNavigationProp = StackNavigationProp<CustomerStackParamList, 'Home'>;
-
-const HomeScreen = () => {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   
   const { 
@@ -45,11 +41,17 @@ const HomeScreen = () => {
   }, [refetchRestaurant, refetchCategories, refetchDishes]);
 
   const navigateToCategory = (categoryId: number) => {
-    navigation.navigate('Menu', { screen: 'Menu', params: { categoryId } });
+    router.push({
+      pathname: '/menu',
+      params: { categoryId }
+    } as never);
   };
 
   const navigateToDish = (dishId: number) => {
-    navigation.navigate('DishDetails', { dishId });
+    router.push({
+      pathname: '/dish/[id]',
+      params: { id: dishId }
+    } as never);
   };
 
   const restaurant = restaurantData?.data;
@@ -142,6 +144,9 @@ const HomeScreen = () => {
                     isPopular={dish.isPopular}
                     isVegetarian={dish.isVegetarian}
                     isSpicy={dish.isSpicy}
+                    restaurantId={dish.restaurantId}
+                    categoryId={dish.categoryId}
+                    nameAr={dish.nameAr}
                   />
                 </TouchableOpacity>
               ))}
@@ -183,3 +188,6 @@ const HomeScreen = () => {
           </Card>
         )}
       </View>
+    </ScrollView>
+  );
+}

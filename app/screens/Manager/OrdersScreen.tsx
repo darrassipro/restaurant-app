@@ -1,20 +1,24 @@
+// app/screens/Manager/OrdersScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useGetRestaurantOrdersQuery } from '../../store/api/orderApi';
-import { ORDER_STATUS } from '../../utils/constants';
-import { formatCurrency, formatDate } from '../../utils/formatters';
+import { ActivityIndicator, FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useGetRestaurantOrdersQuery } from '../../../store/api/orderApi';
+import { Order } from '../../../types/order';
+import { ORDER_STATUS } from '../../../utils/constants';
+import { formatCurrency, formatDate } from '../../../utils/formatters';
 
-const OrdersScreen = () => {
-  const navigation = useNavigation();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+// Define a type for OrderStatus keys for better type safety
+type OrderStatusKey = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+
+export default function OrdersScreen() {
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<OrderStatusKey | null>(null);
   
   const { data: ordersData, isLoading, refetch } = useGetRestaurantOrdersQuery();
   const orders = ordersData?.data || [];
 
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = orders.filter((order: Order) => {
     const matchesSearch = searchQuery === '' || 
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (order.User && 
@@ -25,12 +29,17 @@ const OrdersScreen = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const navigateToOrderDetails = (orderId: number) => {
-    navigation.navigate('OrderDetails', { orderId });
+  const navigateToOrderDetails = (orderId: number): void => {
+    router.push({
+      pathname: '/order-details/[id]',
+      params: { id: orderId }
+    } as never);
   };
 
-  const renderStatusBadge = (status: string) => {
-    const color = ORDER_STATUS[status]?.color || '#666';
+  const renderStatusBadge = (status: OrderStatusKey): React.ReactElement => {
+    // Type assertion to ensure we're accessing valid keys
+    const statusConfig = ORDER_STATUS[status as keyof typeof ORDER_STATUS];
+    const color = statusConfig?.color || '#666';
     
     return (
       <View 
@@ -38,13 +47,13 @@ const OrdersScreen = () => {
         className="px-3 py-1 rounded-full"
       >
         <Text style={{ color }} className="text-xs font-medium">
-          {ORDER_STATUS[status]?.label || status}
+          {statusConfig?.label || status}
         </Text>
       </View>
     );
   };
 
-  const renderStatusFilter = () => (
+  const renderStatusFilter = (): React.ReactElement => (
     <ScrollView 
       horizontal 
       showsHorizontalScrollIndicator={false}
@@ -61,7 +70,7 @@ const OrdersScreen = () => {
         </Text>
       </TouchableOpacity>
       
-      {Object.keys(ORDER_STATUS).map(status => (
+      {(Object.keys(ORDER_STATUS) as OrderStatusKey[]).map((status) => (
         <TouchableOpacity
           key={status}
           onPress={() => setStatusFilter(status)}
@@ -127,7 +136,7 @@ const OrdersScreen = () => {
                   <Text className="font-bold text-gray-800 mr-2">
                     #{item.orderNumber}
                   </Text>
-                  {renderStatusBadge(item.status)}
+                  {renderStatusBadge(item.status as OrderStatusKey)}
                 </View>
                 <Text className="font-bold text-primary">
                   {formatCurrency(item.total)}
@@ -153,7 +162,7 @@ const OrdersScreen = () => {
               )}
             </TouchableOpacity>
           )}
-          contentContainerClassName="pb-4"
+          contentContainerStyle={{ paddingBottom: 16 }}
           refreshing={isLoading}
           onRefresh={refetch}
         />
@@ -167,6 +176,4 @@ const OrdersScreen = () => {
       )}
     </View>
   );
-};
-
-export default OrdersScreen;
+}

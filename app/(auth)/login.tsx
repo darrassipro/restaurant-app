@@ -54,14 +54,9 @@ export default function LoginScreen() {
           })
         );
         
-        router.push({
-          pathname: '/(auth)/otp-verification',
-          params: { 
-            identifier: response.identifier || identifier,
-            type: 'login'
-          }
-        });
-      } else {
+        router.push('/(auth)/otp-verification' as never,
+    );
+      } else if(response.user){
         // Login successful
         dispatch(setUser(response.user));
       }
@@ -156,7 +151,7 @@ export default function LoginScreen() {
           />
           
           <TouchableOpacity
-            onPress={() => router.push('/(auth)/forgot-password')}
+            onPress={() => router.push('/(auth)/forgot-password' as never)}
             className="mt-4"
           >
             <Text className="text-primary text-center">Mot de passe oublié ?</Text>
@@ -165,7 +160,7 @@ export default function LoginScreen() {
           <View className="flex-row justify-center mt-8">
             <Text className="text-gray-600">Pas encore de compte ?</Text>
             <TouchableOpacity
-              onPress={() => router.push('/(auth)/register')}
+              onPress={() => router.push('/(auth)/register' as never)}
               className="ml-1"
             >
               <Text className="text-primary font-semibold">S'inscrire</Text>

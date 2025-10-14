@@ -16,15 +16,15 @@ const RecentOrders = ({ orders }: RecentOrdersProps) => {
   const navigation = useNavigation();
 
   const navigateToOrderDetails = (orderId: number) => {
-    navigation.navigate('OrderDetails', { orderId });
+   // navigation.navigate('OrderDetails', { orderId });
   };
 
   const navigateToAllOrders = () => {
-    navigation.navigate('OrdersDrawer');
+  //  navigation.navigate('OrdersDrawer');
   };
 
   const getStatusColor = (status: string) => {
-    return ORDER_STATUS[status]?.color || '#666';
+   // return ORDER_STATUS[status]?.color || '#666';
   };
 
   return (

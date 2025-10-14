@@ -1,9 +1,9 @@
-// app/screens/Manager/OrdersOverview.tsx
+// components/Manager/OrdersOverview.tsx
 import { Feather } from '@expo/vector-icons';
 import { styled } from 'nativewind';
 import React from 'react';
 import { Text, View } from 'react-native';
-import { ORDER_STATUS } from '../../../utils/constants';
+import { ORDER_STATUS } from '../../utils/constants';
 
 // Define OrderStatus types for type safety
 type OrderStatusKey = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';

@@ -1,17 +1,28 @@
 // app/(manager)/_layout.tsx
 import { Feather } from '@expo/vector-icons';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { Drawer } from 'expo-router/drawer';
 import React from 'react';
-import ManagerDrawerContent from '../../components/Manager/ManagerDrawerContent';
+import { ManagerDrawerContent } from '../../components/Manager/ManagerDrawerContent';
+
+// Workaround to make ManagerDrawerContent work with correct types
+const DrawerContent = (props: DrawerContentComponentProps) => (
+  <ManagerDrawerContent {...props} />
+);
 
 export default function ManagerLayout() {
   return (
     <Drawer
-      drawerContent={(props) => <ManagerDrawerContent {...props} />}
+      drawerContent={DrawerContent}
       screenOptions={{
         drawerActiveBackgroundColor: '#FF5733',
         drawerActiveTintColor: '#fff',
         drawerInactiveTintColor: '#333',
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: '#FF5733'
+        },
+        headerTintColor: '#fff',
       }}
     >
       <Drawer.Screen 
@@ -54,6 +65,13 @@ export default function ManagerLayout() {
         options={{ 
           title: 'Paramètres',
           drawerIcon: ({ color }) => <Feather name="settings" size={22} color={color} />
+        }} 
+      />
+      <Drawer.Screen 
+        name="order-details/[id]" 
+        options={{ 
+          title: 'Détails de la commande',
+          drawerItemStyle: { display: 'none' } // Hide from drawer menu
         }} 
       />
     </Drawer>

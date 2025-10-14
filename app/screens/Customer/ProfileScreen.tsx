@@ -1,17 +1,13 @@
+// app/screens/Customer/ProfileScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
 import React from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { useAuth } from '../../hooks/useAuth';
-import { CustomerStackParamList } from '../../navigation/types';
-import { selectUser } from '../../store/slices/authSlice';
+import { useAuth } from '../../../hooks/useAuth';
+import { selectUser } from '../../../store/slices/authSlice';
 
-type ProfileScreenNavigationProp = StackNavigationProp<CustomerStackParamList, 'Profile'>;
-
-const ProfileScreen = () => {
-  const navigation = useNavigation<ProfileScreenNavigationProp>();
+export default function ProfileScreen() {
   const user = useSelector(selectUser);
   const { logout } = useAuth();
 
@@ -33,6 +29,10 @@ const ProfileScreen = () => {
     );
   };
 
+  const navigateTo = (path: string) => {
+    router.push(path as never);
+  };
+
   return (
     <ScrollView className="flex-1 bg-gray-50">
       {/* Profile Header */}
@@ -52,7 +52,7 @@ const ProfileScreen = () => {
       <View className="p-4">
         <View className="bg-white rounded-lg shadow-sm overflow-hidden">
           <TouchableOpacity
-            onPress={() => navigation.navigate('EditProfile')}
+            onPress={() => navigateTo('/edit-profile')}
             className="flex-row items-center p-4 border-b border-gray-100"
           >
             <Feather name="user" size={22} color="#FF5733" />
@@ -64,7 +64,7 @@ const ProfileScreen = () => {
           </TouchableOpacity>
           
           <TouchableOpacity
-            onPress={() => navigation.navigate('AddressBook')}
+            onPress={() => navigateTo('/address-book')}
             className="flex-row items-center p-4 border-b border-gray-100"
           >
             <Feather name="map-pin" size={22} color="#FF5733" />
@@ -76,7 +76,7 @@ const ProfileScreen = () => {
           </TouchableOpacity>
           
           <TouchableOpacity
-            onPress={() => navigation.navigate('OrderHistory')}
+            onPress={() => navigateTo('/order-history')}
             className="flex-row items-center p-4"
           >
             <Feather name="shopping-bag" size={22} color="#FF5733" />
@@ -105,6 +105,4 @@ const ProfileScreen = () => {
       </View>
     </ScrollView>
   );
-};
-
-export default ProfileScreen;
+}

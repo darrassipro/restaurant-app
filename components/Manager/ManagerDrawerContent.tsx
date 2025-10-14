@@ -1,12 +1,13 @@
+// components/Manager/ManagerDrawerContent.tsx
 import { Feather } from '@expo/vector-icons';
-import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../hooks/useAuth';
 import { selectUser } from '../../store/slices/authSlice';
 
-export const ManagerDrawerContent = (props) => {
+export const ManagerDrawerContent = (props: DrawerContentComponentProps) => {
   const user = useSelector(selectUser);
   const { logout } = useAuth();
 

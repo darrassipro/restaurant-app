@@ -1,6 +1,8 @@
 // app/(customer)/home.tsx
+import { Category } from '@/types/dish';
+import { Restaurant } from '@/types/restaurant';
 import { Feather } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import DishCard from '../../components/features/DishCard';
@@ -9,6 +11,7 @@ import { useGetCategoriesQuery } from '../../store/api/categoryApi';
 import { useGetDishesQuery } from '../../store/api/dishApi';
 import { useGetRestaurantQuery } from '../../store/api/restaurantApi';
 import { formatCurrency } from '../../utils/formatters';
+
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
@@ -40,8 +43,22 @@ export default function HomeScreen() {
     setRefreshing(false);
   }, [refetchRestaurant, refetchCategories, refetchDishes]);
 
-  const restaurant = restaurantData?.data;
-  const categories = categoriesData?.data || [];
+  const navigateToCategory = (categoryId: number) => {
+    router.push({
+      pathname: '/menu',
+      params: { categoryId }
+    } as never);
+  };
+
+  const navigateToDish = (dishId: number) => {
+    router.push({
+      pathname: '/dish/[id]',
+      params: { id: dishId }
+    } as never);
+  };
+
+  const restaurant: Restaurant | undefined = restaurantData?.data;
+  const categories: Category[] = categoriesData?.data || [];
 
   return (
     <ScrollView 
@@ -89,21 +106,16 @@ export default function HomeScreen() {
               className="overflow-visible"
             >
               {categories.map((category) => (
-                <Link
+                <TouchableOpacity
                   key={category.id}
-                  href={{
-                    pathname: "/(customer)/menu",
-                    params: { categoryId: category.id }
-                  }}
-                  asChild
+                  onPress={() => navigateToCategory(category.id)}
+                  className="mr-4"
                 >
-                  <TouchableOpacity className="mr-4">
-                    <Card className="w-24 h-24 items-center justify-center">
-                      <Text className="text-2xl mb-1">{category.icon}</Text>
-                      <Text className="text-sm text-center">{category.nameFr}</Text>
-                    </Card>
-                  </TouchableOpacity>
-                </Link>
+                  <Card className="w-24 h-24 items-center justify-center">
+                    <Text className="text-2xl mb-1">{category.icon}</Text>
+                    <Text className="text-sm text-center">{category.nameFr}</Text>
+                  </Card>
+                </TouchableOpacity>
               ))}
             </ScrollView>
           )}
@@ -121,27 +133,25 @@ export default function HomeScreen() {
               className="overflow-visible"
             >
               {popularDishes.map((dish) => (
-                <Link
+                <TouchableOpacity
                   key={dish.id}
-                  href={{
-                    pathname: "/(customer)/dish/[id]",
-                    params: { id: dish.id }
-                  }}
-                  asChild
+                  onPress={() => navigateToDish(dish.id)}
+                  className="mr-4"
                 >
-                  <TouchableOpacity className="mr-4">
-                    <DishCard
-                      id={dish.id}
-                      name={dish.nameFr}
-                      image={dish.image[0]}
-                      price={formatCurrency(dish.price)}
-                      rating={dish.averageRating}
-                      isPopular={dish.isPopular}
-                      isVegetarian={dish.isVegetarian}
-                      isSpicy={dish.isSpicy}
-                    />
-                  </TouchableOpacity>
-                </Link>
+                  <DishCard
+                    id={dish.id}
+                    name={dish.nameFr}
+                    image={dish.image[0]}
+                    price={formatCurrency(dish.price)}
+                    rating={dish.averageRating}
+                    isPopular={dish.isPopular}
+                    isVegetarian={dish.isVegetarian}
+                    isSpicy={dish.isSpicy}
+                    restaurantId={dish.restaurantId}
+                    categoryId={dish.categoryId}
+                    nameAr={dish.nameAr}
+                  />
+                </TouchableOpacity>
               ))}
               {popularDishes.length === 0 && (
                 <Text className="text-gray-500">Aucun plat populaire disponible pour le moment.</Text>

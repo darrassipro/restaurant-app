@@ -1,14 +1,15 @@
 // hooks/useSound.ts
-import { Audio } from 'expo-av';
+import { Audio, AVPlaybackSource, AVPlaybackStatus } from 'expo-av';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectSoundEnabled } from '../store/slices/notificationsSlice';
 
-// Define sound assets
-const SOUND_ASSETS = {
-  notification: require('../assets/sounds/notification.mp3'),
-  order: require('../assets/sounds/order.mp3'),
-  error: require('../assets/sounds/error.mp3'),
+// Define sound assets with proper AVPlaybackSource type
+// Using require directly causes type issues, so we need to properly cast them
+const SOUND_ASSETS: Record<string, AVPlaybackSource> = {
+  notification: require('../assets/sounds/notification.mp3') as unknown as AVPlaybackSource,
+  order: require('../assets/sounds/order.mp3') as unknown as AVPlaybackSource,
+  error: require('../assets/sounds/error.mp3') as unknown as AVPlaybackSource,
 };
 
 export const useSound = () => {
@@ -16,7 +17,7 @@ export const useSound = () => {
   
   // Configure audio on mount
   useEffect(() => {
-    const configureAudio = async () => {
+    const configureAudio = async (): Promise<void> => {
       try {
         await Audio.setAudioModeAsync({
           playsInSilentModeIOS: true,
@@ -31,7 +32,7 @@ export const useSound = () => {
     configureAudio();
   }, []);
   
-  const playSound = async (type: keyof typeof SOUND_ASSETS) => {
+  const playSound = async (type: keyof typeof SOUND_ASSETS): Promise<void> => {
     if (!soundEnabled) return;
     
     try {
@@ -39,8 +40,8 @@ export const useSound = () => {
       await sound.playAsync();
       
       // Clean up after playing
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
+      sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+        if (status.isLoaded && status.didJustFinish) {
           sound.unloadAsync();
         }
       });

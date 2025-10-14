@@ -1,8 +1,9 @@
+// components/Manager/TodaysSales.tsx
 import { Feather } from '@expo/vector-icons';
 import { styled } from 'nativewind';
 import React from 'react';
 import { Text, View } from 'react-native';
-import { formatCurrency } from '../../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 interface TodaysSalesProps {
   orderCount: number;

@@ -4,7 +4,32 @@ import { useDispatch, useSelector } from 'react-redux';
 import { io, Socket } from 'socket.io-client';
 import { selectUser } from '../store/slices/authSlice';
 import { addNotification } from '../store/slices/notificationsSlice';
+import { Order } from '../types/order';
 import { SOCKET_URL } from '../utils/constants';
+
+interface LowStockAlert {
+  dishId: number;
+  dishName: string;
+  currentStock: number;
+  minimumStock: number;
+  percentage: number;
+}
+
+interface OrderStatusUpdate {
+  orderId: number;
+  newStatus: string;
+  orderNumber: string;
+  customerId?: number;
+  restaurantId?: number;
+  timestamp: string;
+}
+
+interface CustomerNotification {
+  orderId: number;
+  message: string;
+  orderNumber: string;
+  status: string;
+}
 
 export const useSocket = () => {
   const user = useSelector(selectUser);
@@ -39,14 +64,14 @@ export const useSocket = () => {
         setIsConnected(false);
       });
 
-      socketRef.current.on('error', (error) => {
+      socketRef.current.on('error', (error: Error) => {
         console.error('Socket error:', error);
       });
 
       // Listen for notifications based on user role
       if (user.role === 'admin' || user.role === 'manager' || user.role === 'chef') {
         // Restaurant staff notifications
-        socketRef.current.on('newOrder', (order) => {
+        socketRef.current.on('newOrder', (order: Order) => {
           dispatch(
             addNotification({
               message: `Nouvelle commande reçue: ${order.orderNumber}`,
@@ -56,7 +81,7 @@ export const useSocket = () => {
           );
         });
 
-        socketRef.current.on('lowStockAlert', (alert) => {
+        socketRef.current.on('lowStockAlert', (alert: LowStockAlert) => {
           dispatch(
             addNotification({
               message: `Stock bas: ${alert.dishName} (${alert.currentStock} restant)`,
@@ -69,7 +94,7 @@ export const useSocket = () => {
 
       if (user.role === 'customer') {
         // Customer notifications
-        socketRef.current.on('customerNotification', (notification) => {
+        socketRef.current.on('customerNotification', (notification: CustomerNotification) => {
           dispatch(
             addNotification({
               message: notification.message,
@@ -80,8 +105,8 @@ export const useSocket = () => {
         });
       }
 
-      socketRef.current.on('orderStatusUpdated', (update) => {
-        const statusMessages = {
+      socketRef.current.on('orderStatusUpdated', (update: OrderStatusUpdate) => {
+        const statusMessages: Record<string, string> = {
           confirmed: 'Commande confirmée',
           preparing: 'Commande en préparation',
           ready: 'Commande prête',
@@ -110,7 +135,7 @@ export const useSocket = () => {
   }, [user, dispatch]);
 
   // Function to emit events
-  const emit = (eventName: string, data?: any) => {
+  const emit = (eventName: string, data?: any): boolean => {
     if (socketRef.current && isConnected) {
       socketRef.current.emit(eventName, data);
       return true;
@@ -119,7 +144,7 @@ export const useSocket = () => {
   };
 
   // Toggle sound alerts
-  const toggleSoundAlerts = (enabled: boolean) => {
+  const toggleSoundAlerts = (enabled: boolean): void => {
     if (user) {
       emit('toggleSoundAlerts', {
         userId: user.id,

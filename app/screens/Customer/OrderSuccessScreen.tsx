@@ -1,51 +1,49 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+// app/screens/Customer/OrderSuccessScreen.tsx
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
-import { Image, ScrollView, Text, View } from 'react-native';
-import Button from '../../components/UI/Button';
-import { CustomerStackParamList } from '../../navigation/types';
-import { useGetOrderByIdQuery } from '../../store/api/orderApi';
-import { formatDate } from '../../utils/formatters';
+import { BackHandler, Image, ScrollView, Text, View } from 'react-native';
+import Button from '../../../components/ui/Button';
+import { useGetOrderByIdQuery } from '../../../store/api/orderApi';
+import { formatCurrency, formatDate } from '../../../utils/formatters';
 
-type OrderSuccessScreenRouteProp = RouteProp<CustomerStackParamList, 'OrderSuccess'>;
-type OrderSuccessScreenNavigationProp = StackNavigationProp<CustomerStackParamList, 'OrderSuccess'>;
-
-const OrderSuccessScreen = () => {
-  const route = useRoute<OrderSuccessScreenRouteProp>();
-  const navigation = useNavigation<OrderSuccessScreenNavigationProp>();
-  const { orderId, orderNumber } = route.params;
+export default function OrderSuccessScreen() {
+  const params = useLocalSearchParams();
+  const orderId = typeof params.orderId === 'string' ? parseInt(params.orderId) : 0;
+  const orderNumber = params.orderNumber as string;
   
   const { data: orderData } = useGetOrderByIdQuery(orderId);
   const order = orderData?.data;
   
-  // Prevent going back to checkout
+  // Prevent going back to checkout using BackHandler instead of router.addListener
   useEffect(() => {
-    navigation.addListener('beforeRemove', (e) => {
-      if (e.data.action.type === 'GO_BACK') {
-        e.preventDefault();
-        navigation.navigate('HomeTab');
-      }
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Navigate to home instead of going back
+      router.push('/home' as never);
+      return true; // Prevent default behavior
     });
     
     return () => {
-      navigation.removeListener('beforeRemove', () => {});
+      backHandler.remove();
     };
-  }, [navigation]);
+  }, []);
 
   const handleViewOrder = () => {
-    navigation.navigate('OrderDetails', { orderId });
+    router.push({
+      pathname: '/order-details/[id]',
+      params: { id: orderId }
+    } as never);
   };
 
   const handleContinueShopping = () => {
-    navigation.navigate('HomeTab');
+    router.push('/home' as never);
   };
 
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="p-6 items-center">
         <Image
-          source={require('../../assets/images/order-success.png')}
-          className="w-40 h-40"
+          source={require('../../../assets/images/order-success.png')}
+          style={{ width: 160, height: 160 }}
           resizeMode="contain"
         />
         
@@ -80,7 +78,7 @@ const OrderSuccessScreen = () => {
               
               <View className="flex-row justify-between mt-2">
                 <Text className="text-gray-600">Total:</Text>
-                <Text className="font-bold">{order.total} MAD</Text>
+                <Text className="font-bold">{formatCurrency(order.total)}</Text>
               </View>
               
               {order.estimatedDelivery && (
@@ -117,6 +115,4 @@ const OrderSuccessScreen = () => {
       </View>
     </ScrollView>
   );
-};
-
-export default OrderSuccessScreen;
+}

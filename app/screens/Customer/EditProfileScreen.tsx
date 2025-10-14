@@ -1,14 +1,14 @@
-import { useNavigation } from '@react-navigation/native';
+// app/screens/Customer/EditProfileScreen.tsx
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import Button from '../../components/UI/Button';
-import Input from '../../components/UI/Input';
-import { useChangePasswordMutation, useUpdateProfileMutation } from '../../store/api/authApi';
-import { selectUser } from '../../store/slices/authSlice';
+import Button from '../../../components/ui/Button';
+import Input from '../../../components/ui/Input';
+import { useChangePasswordMutation, useUpdateProfileMutation } from '../../../store/api/authApi';
+import { selectUser } from '../../../store/slices/authSlice';
 
-const EditProfileScreen = () => {
-  const navigation = useNavigation();
+export default function EditProfileScreen() {
   const user = useSelector(selectUser);
   
   const [isPasswordSection, setIsPasswordSection] = useState(false);
@@ -80,7 +80,7 @@ const EditProfileScreen = () => {
     try {
       await updateProfile(formData).unwrap();
       Alert.alert('Succès', 'Profil mis à jour avec succès');
-      navigation.goBack();
+      router.back();
     } catch (error) {
       console.error('Update profile error:', error);
       Alert.alert('Erreur', 'Une erreur est survenue lors de la mise à jour du profil');
@@ -93,7 +93,7 @@ const EditProfileScreen = () => {
     try {
       await changePassword(passwordData).unwrap();
       Alert.alert('Succès', 'Mot de passe modifié avec succès');
-      navigation.goBack();
+      router.back();
     } catch (error) {
       console.error('Change password error:', error);
       Alert.alert('Erreur', 'Mot de passe actuel incorrect ou autre erreur');
@@ -246,6 +246,4 @@ const EditProfileScreen = () => {
       </ScrollView>
     </KeyboardAvoidingView>
   );
-};
-
-export default EditProfileScreen;
+}

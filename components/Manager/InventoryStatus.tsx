@@ -1,10 +1,10 @@
-// app/screens/Manager/InventoryStatus.tsx
+// components/Manager/InventoryStatus.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { styled } from 'nativewind';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { Inventory } from '../../../types/inventory';
+import { Inventory } from '../../types/inventory';
 
 interface InventoryStatusProps {
   lowStockItems: Inventory[];

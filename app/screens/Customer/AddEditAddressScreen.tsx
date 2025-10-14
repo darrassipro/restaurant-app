@@ -1,21 +1,18 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+// app/screens/Customer/AddEditAddressScreen.tsx
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import Button from '../../components/UI/Button';
-import Input from '../../components/UI/Input';
-import { CustomerStackParamList } from '../../navigation/types';
-import { useCreateAddressMutation, useGetAddressByIdQuery, useUpdateAddressMutation } from '../../store/api/addressApi';
+import Button from '../../../components/ui/Button';
+import Input from '../../../components/ui/Input';
+import { useCreateAddressMutation, useGetAddressByIdQuery, useUpdateAddressMutation } from '../../../store/api/addressApi';
+import { Address } from '../../../types/address';
 
-type AddEditAddressScreenRouteProp = RouteProp<CustomerStackParamList, 'AddEditAddress'>;
-
-const AddEditAddressScreen = () => {
-  const route = useRoute<AddEditAddressScreenRouteProp>();
-  const navigation = useNavigation();
-  
-  const { addressId } = route.params || {};
+export default function AddEditAddressScreen() {
+  const params = useLocalSearchParams();
+  const addressId = params.addressId ? parseInt(params.addressId as string) : undefined;
   const isEditMode = !!addressId;
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<Address>>({
     city: '',
     sector: '',
     addressName: '',
@@ -27,7 +24,7 @@ const AddEditAddressScreen = () => {
     contactPhone: '',
   });
   
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   
   const { data: addressData, isLoading: isLoadingAddress } = useGetAddressByIdQuery(addressId || 0, {
     skip: !isEditMode,
@@ -55,25 +52,25 @@ const AddEditAddressScreen = () => {
   }, [addressData, isEditMode]);
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+    const newErrors: Record<string, string> = {};
     
-    if (!formData.city.trim()) {
+    if (!formData.city?.trim()) {
       newErrors.city = 'La ville est requise';
     }
     
-    if (!formData.sector.trim()) {
+    if (!formData.sector?.trim()) {
       newErrors.sector = 'Le secteur est requis';
     }
     
-    if (!formData.addressName.trim()) {
+    if (!formData.addressName?.trim()) {
       newErrors.addressName = "L'adresse est requise";
     }
     
-    if (!formData.contactName.trim()) {
+    if (!formData.contactName?.trim()) {
       newErrors.contactName = 'Le nom de contact est requis';
     }
     
-    if (!formData.contactPhone.trim()) {
+    if (!formData.contactPhone?.trim()) {
       newErrors.contactPhone = 'Le téléphone de contact est requis';
     } else if (!/^\+?\d{10,15}$/.test(formData.contactPhone.replace(/\s/g, ''))) {
       newErrors.contactPhone = 'Format de téléphone invalide';
@@ -88,20 +85,23 @@ const AddEditAddressScreen = () => {
     
     try {
       if (isEditMode && addressId) {
-        await updateAddress({ id: addressId, address: formData }).unwrap();
+        await updateAddress({ 
+          id: addressId, 
+          address: formData as Address 
+        }).unwrap();
         Alert.alert('Succès', 'Adresse mise à jour avec succès');
       } else {
-        await createAddress(formData).unwrap();
+        await createAddress(formData as Address).unwrap();
         Alert.alert('Succès', 'Adresse ajoutée avec succès');
       }
-      navigation.goBack();
+      router.back();
     } catch (error) {
       console.error('Address save error:', error);
       Alert.alert('Erreur', "Une erreur est survenue lors de l'enregistrement de l'adresse");
     }
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = (field: keyof Address, value: string | boolean) => {
     setFormData({
       ...formData,
       [field]: value,
@@ -206,6 +206,4 @@ const AddEditAddressScreen = () => {
       </ScrollView>
     </KeyboardAvoidingView>
   );
-};
-
-export default AddEditAddressScreen;
+}

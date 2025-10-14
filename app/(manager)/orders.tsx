@@ -2,19 +2,48 @@
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useGetRestaurantOrdersQuery } from '../../store/api/orderApi';
 import { ORDER_STATUS } from '../../utils/constants';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
+// Define Order type for better type safety
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+interface OrderItem {
+  id: number;
+  dishId: number;
+  quantity: number;
+  dishPrice: string;
+}
+
+interface Order {
+  id: number;
+  orderNumber: string;
+  total: string;
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+  createdAt: string;
+  updatedAt: string;
+  User?: User;
+  items?: OrderItem[];
+}
+
+// Define OrderStatus type for type safety
+type OrderStatusKey = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+
 export default function OrdersScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<OrderStatusKey | null>(null);
   
   const { data: ordersData, isLoading, refetch } = useGetRestaurantOrdersQuery();
-  const orders = ordersData?.data || [];
+  const orders: Order[] = ordersData?.data || [];
 
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = orders.filter((order: Order) => {
     const matchesSearch = searchQuery === '' || 
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (order.User && 
@@ -25,12 +54,17 @@ export default function OrdersScreen() {
     return matchesSearch && matchesStatus;
   });
 
-  const navigateToOrderDetails = (orderId: number) => {
-    router.push(`/manager/order-details/${orderId}`);
+  const navigateToOrderDetails = (orderId: number): void => {
+    router.push({
+      pathname: '/order-details/[id]',
+      params: { id: orderId }
+    } as never);
   };
 
-  const renderStatusBadge = (status: string) => {
-    const color = ORDER_STATUS[status]?.color || '#666';
+  const renderStatusBadge = (status: OrderStatusKey): React.ReactElement => {
+    // Type assertion to ensure we're accessing valid keys
+    const statusConfig = ORDER_STATUS[status];
+    const color = statusConfig?.color || '#666';
     
     return (
       <View 
@@ -38,13 +72,13 @@ export default function OrdersScreen() {
         className="px-3 py-1 rounded-full"
       >
         <Text style={{ color }} className="text-xs font-medium">
-          {ORDER_STATUS[status]?.label || status}
+          {statusConfig?.label || status}
         </Text>
       </View>
     );
   };
 
-  const renderStatusFilter = () => (
+  const renderStatusFilter = (): React.ReactElement => (
     <ScrollView 
       horizontal 
       showsHorizontalScrollIndicator={false}
@@ -61,7 +95,7 @@ export default function OrdersScreen() {
         </Text>
       </TouchableOpacity>
       
-      {Object.keys(ORDER_STATUS).map(status => (
+      {(Object.keys(ORDER_STATUS) as OrderStatusKey[]).map((status) => (
         <TouchableOpacity
           key={status}
           onPress={() => setStatusFilter(status)}
@@ -153,7 +187,7 @@ export default function OrdersScreen() {
               )}
             </TouchableOpacity>
           )}
-          contentContainerClassName="pb-4"
+          contentContainerStyle={{ paddingBottom: 16 }}
           refreshing={isLoading}
           onRefresh={refetch}
         />

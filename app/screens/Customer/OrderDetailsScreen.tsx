@@ -1,28 +1,31 @@
+// app/screens/Customer/OrderDetailsScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import Button from '../../components/UI/Button';
-import { CustomerStackParamList } from '../../navigation/types';
-import { useGetOrderByIdQuery } from '../../store/api/orderApi';
-import { ORDER_STATUS } from '../../utils/constants';
-import { formatCurrency, formatDate, formatPhoneNumber } from '../../utils/formatters';
+import Button from '../../../components/ui/Button';
+import { useGetOrderByIdQuery } from '../../../store/api/orderApi';
+import { ORDER_STATUS } from '../../../utils/constants';
+import { formatCurrency, formatDate, formatPhoneNumber } from '../../../utils/formatters';
 
-type OrderDetailsScreenRouteProp = RouteProp<CustomerStackParamList, 'OrderDetails'>;
+// Define OrderStatus types for type safety
+type OrderStatusKey = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
 
-const OrderDetailsScreen = () => {
-  const route = useRoute<OrderDetailsScreenRouteProp>();
-  const { orderId } = route.params;
+export default function OrderDetailsScreen() {
+  const params = useLocalSearchParams();
+  const orderId = typeof params.id === 'string' ? parseInt(params.id) : 0;
   
   const { data: orderData, isLoading, refetch } = useGetOrderByIdQuery(orderId);
   const order = orderData?.data;
 
-  const getStatusColor = (status: string) => {
-    return ORDER_STATUS[status]?.color || '#666';
+  const getStatusColor = (status: string): string => {
+    const statusKey = status as OrderStatusKey;
+    return ORDER_STATUS[statusKey]?.color || '#666';
   };
 
-  const getStatusLabel = (status: string) => {
-    return ORDER_STATUS[status]?.label || status;
+  const getStatusLabel = (status: string): string => {
+    const statusKey = status as OrderStatusKey;
+    return ORDER_STATUS[statusKey]?.label || status;
   };
 
   if (isLoading) {
@@ -209,6 +212,4 @@ const OrderDetailsScreen = () => {
       </View>
     </ScrollView>
   );
-};
-
-export default OrderDetailsScreen;
+}

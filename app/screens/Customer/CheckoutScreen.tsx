@@ -1,14 +1,13 @@
+// app/screens/Customer/CheckoutScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import Button from '../../components/UI/Button';
-import Input from '../../components/UI/Input';
-import AddressSelector from '../../components/features/AddressSelector';
-import { CustomerStackParamList } from '../../navigation/types';
-import { useCreateOrderMutation } from '../../store/api/orderApi';
+import AddressSelector from '../../../components/features/AddressSelector';
+import Button from '../../../components/ui/Button';
+import Input from '../../../components/ui/Input';
+import { useCreateOrderMutation } from '../../../store/api/orderApi';
 import {
     clearCart,
     selectCartItems,
@@ -16,13 +15,10 @@ import {
     selectDeliveryFee,
     selectGrandTotal,
     selectTaxAmount
-} from '../../store/slices/cartSlice';
-import { formatCurrency } from '../../utils/formatters';
+} from '../../../store/slices/cartSlice';
+import { formatCurrency } from '../../../utils/formatters';
 
-type CheckoutScreenNavigationProp = StackNavigationProp<CustomerStackParamList, 'Checkout'>;
-
-const CheckoutScreen = () => {
-  const navigation = useNavigation<CheckoutScreenNavigationProp>();
+export default function CheckoutScreen() {
   const dispatch = useDispatch();
   
   const cartItems = useSelector(selectCartItems);
@@ -62,10 +58,13 @@ const CheckoutScreen = () => {
       
       // Clear cart and go to success page
       dispatch(clearCart());
-      navigation.navigate('OrderSuccess', { 
-        orderId: response.data.id,
-        orderNumber: response.data.orderNumber
-      });
+      router.push({
+        pathname: '/order-success',
+        params: { 
+          orderId: response.data.id,
+          orderNumber: response.data.orderNumber
+        }
+      } as never);
       
     } catch (error) {
       console.error('Order creation error:', error);
@@ -80,7 +79,8 @@ const CheckoutScreen = () => {
           {/* Delivery Address */}
           <AddressSelector
             selectedAddressId={selectedAddressId}
-            onSelectAddress={(address) => setSelectedAddressId(address.id)}
+            onSelectAddress={(address) => setSelectedAddressId(address.id ?? null)}
+
           />
           
           {/* Order Items */}
@@ -178,6 +178,4 @@ const CheckoutScreen = () => {
       </View>
     </View>
   );
-};
-
-export default CheckoutScreen;
+}

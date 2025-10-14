@@ -1,11 +1,29 @@
 // app/screens/Admin/RecentOrders.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { styled } from 'nativewind';
 import React from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { Order } from '../../../types/order';
 import { ORDER_STATUS } from '../../../utils/constants';
 import { formatCurrency, formatDate } from '../../../utils/formatters';
+
+// Define Order type to fix type issues
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+interface Order {
+  id: number;
+  orderNumber: string;
+  total: string;
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+  createdAt: string;
+  updatedAt: string;
+  User?: User;
+}
 
 interface RecentOrdersProps {
   orders: Order[];
@@ -13,19 +31,20 @@ interface RecentOrdersProps {
   showViewAll?: boolean;
 }
 
-export default function RecentOrders({ orders, limit = 5, showViewAll = true }: RecentOrdersProps) {
+const RecentOrders = ({ orders, limit = 5, showViewAll = true }: RecentOrdersProps) => {
   const displayOrders = limit ? orders.slice(0, limit) : orders;
 
   const navigateToOrderDetails = (orderId: number) => {
-    router.push(`/(admin)/orders/${orderId}`);
+    router.push(`/orders/${orderId}` as never);
   };
 
   const navigateToAllOrders = () => {
-    router.push('/(admin)/orders');
+    router.push('/orders' as never);
   };
 
   const getStatusColor = (status: string) => {
-    return ORDER_STATUS[status]?.color || '#666';
+    const statusKey = status as keyof typeof ORDER_STATUS;
+    return ORDER_STATUS[statusKey]?.color || '#666';
   };
 
   const renderOrderItem = ({ item }: { item: Order }) => (
@@ -49,7 +68,7 @@ export default function RecentOrders({ orders, limit = 5, showViewAll = true }: 
               style={{ backgroundColor: getStatusColor(item.status) }}
             />
             <Text className="text-gray-600 text-sm">
-              {ORDER_STATUS[item.status]?.label || item.status}
+              {ORDER_STATUS[item.status as keyof typeof ORDER_STATUS]?.label || item.status}
             </Text>
           </View>
         </View>
@@ -87,4 +106,6 @@ export default function RecentOrders({ orders, limit = 5, showViewAll = true }: 
       )}
     </View>
   );
-}
+};
+
+export default styled(RecentOrders);

@@ -48,7 +48,7 @@ export default function KitchenScreen() {
   };
 
   const handleViewOrder = (orderId: number) => {
-    router.push(`/chef/order-details/${orderId}`);
+    router.push(`/chef/order-details/${orderId}` as never);
   };
 
   const renderTab = (
@@ -119,7 +119,7 @@ export default function KitchenScreen() {
               currentTab={activeTab}
             />
           )}
-          contentContainerClassName="p-4"
+          
           refreshing={isLoading || isUpdating}
           onRefresh={refetch}
         />

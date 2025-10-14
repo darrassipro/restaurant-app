@@ -1,22 +1,19 @@
+// app/screens/Customer/DishDetailsScreen.tsx
 import { Feather } from '@expo/vector-icons';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import Button from '../../components/UI/Button';
-import { CustomerStackParamList } from '../../navigation/types';
-import { useGetDishByIdQuery } from '../../store/api/dishApi';
-import { addToCart } from '../../store/slices/cartSlice';
-import { formatCurrency } from '../../utils/formatters';
+import Button from '../../../components/ui/Button';
+import { useGetDishByIdQuery } from '../../../store/api/dishApi';
+import { addToCart } from '../../../store/slices/cartSlice';
+import { formatCurrency } from '../../../utils/formatters';
 
-type DishDetailsScreenRouteProp = RouteProp<CustomerStackParamList, 'DishDetails'>;
-
-const DishDetailsScreen = () => {
-  const route = useRoute<DishDetailsScreenRouteProp>();
-  const navigation = useNavigation();
-  const { dishId } = route.params;
+export default function DishDetailsScreen() {
+  const { id } = useLocalSearchParams();
   const dispatch = useDispatch();
   
+  const dishId = typeof id === 'string' ? parseInt(id) : 0;
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   
@@ -36,6 +33,7 @@ const DishDetailsScreen = () => {
         dish: {
           id: dish.id,
           nameFr: dish.nameFr,
+          nameAr: dish.nameAr,
           price: dish.price,
           image: dish.image,
           restaurantId: dish.restaurantId,
@@ -45,7 +43,7 @@ const DishDetailsScreen = () => {
       })
     );
     
-    navigation.goBack();
+    router.back();
   };
 
   if (isLoading) {
@@ -236,6 +234,4 @@ const DishDetailsScreen = () => {
       </View>
     </ScrollView>
   );
-};
-
-export default DishDetailsScreen;
+}

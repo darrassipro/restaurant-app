@@ -1,3 +1,4 @@
+// store/api/authApi.ts
 import { AuthResponse, LoginRequest, OtpVerification, RegisterRequest, User } from '../../types/auth';
 import { apiSlice } from './apiSlice';
 
