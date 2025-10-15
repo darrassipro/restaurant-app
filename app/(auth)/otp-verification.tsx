@@ -1,16 +1,23 @@
-// app/screens/Auth/OtpVerificationScreen.tsx
+// app/(auth)/otp-verification.tsx
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useDispatch } from 'react-redux';
-import Button from '../../../components/ui/Button';
 import {
-  useResendOtpMutation,
-  useResetPasswordOtpMutation,
-  useVerifyLoginOtpMutation,
-  useVerifyRegistrationOtpMutation,
-} from '../../../store/api/authApi';
-import { setOtpVerification, setUser } from '../../../store/slices/authSlice';
+    Alert,
+    Image,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import { useDispatch } from 'react-redux';
+import Button from '../../components/ui/Button';
+import {
+    useResendOtpMutation,
+    useResetPasswordOtpMutation,
+    useVerifyLoginOtpMutation,
+    useVerifyRegistrationOtpMutation,
+} from '../../store/api/authApi';
+import { setOtpVerification } from '../../store/slices/authSlice';
 
 export default function OtpVerificationScreen() {
   const params = useLocalSearchParams();
@@ -24,14 +31,16 @@ export default function OtpVerificationScreen() {
   const [resendTimeout, setResendTimeout] = useState(60);
 
   const [verifyLoginOtp, { isLoading: isVerifyingLogin }] = useVerifyLoginOtpMutation();
-  const [verifyRegistrationOtp, { isLoading: isVerifyingRegistration }] = useVerifyRegistrationOtpMutation();
-  const [resetPasswordOtp, { isLoading: isVerifyingReset }] = useResetPasswordOtpMutation();
+  const [verifyRegistrationOtp, { isLoading: isVerifyingRegistration }] =
+    useVerifyRegistrationOtpMutation();
+  const [resetPasswordOtp, { isLoading: isVerifyingReset }] =
+    useResetPasswordOtpMutation();
   const [resendOtp, { isLoading: isResending }] = useResendOtpMutation();
 
   const isVerifying = isVerifyingLogin || isVerifyingRegistration || isVerifyingReset;
 
   useEffect(() => {
-    let interval: number | undefined;
+    let interval: number | null = null;
     if (resendTimeout > 0) {
       interval = setInterval(() => {
         setResendTimeout((prevTimeout) => prevTimeout - 1);
@@ -50,62 +59,46 @@ export default function OtpVerificationScreen() {
     }
 
     try {
-      if (verificationType === 'login') {
-        const response = await verifyLoginOtp({
-          identifier,
-          password: '', // Password already validated during login
-          otp: otpString,
-        }).unwrap();
+      let response;
 
-        if (response.user) {
-          dispatch(setUser(response.user));
-          dispatch(
-            setOtpVerification({
-              isRequired: false,
-              identifier: '',
-              type: undefined,
-            })
-          );
-        }
-      } else if (verificationType === 'register') {
-        await verifyRegistrationOtp({
-          otp: otpString,
-          identifier,
-        }).unwrap();
+      switch (verificationType) {
+        case 'login':
+          response = await verifyLoginOtp({
+            identifier,
+            password: '', // Password was already verified
+            otp: otpString,
+          }).unwrap();
+          break;
+        case 'register':
+          response = await verifyRegistrationOtp({
+            identifier,
+            otp: otpString,
+          }).unwrap();
+          break;
+        case 'reset-password':
+          response = await resetPasswordOtp({
+            identifier,
+            otp: otpString,
+          }).unwrap();
+          break;
+      }
 
-        dispatch(
-          setOtpVerification({
-            isRequired: false,
-            identifier: '',
-            type: undefined,
-          })
-        );
+      // Clear OTP verification state
+      dispatch(
+        setOtpVerification({
+          isRequired: false,
+          identifier: '',
+          type: undefined,
+        })
+      );
 
-        Alert.alert('Succès', 'Votre compte a été activé avec succès', [
-          {
-            text: 'OK',
-            onPress: () => router.replace('/(auth)/login'),
-          },
-        ]);
+      if (verificationType === 'register') {
+        Alert.alert('Succès', 'Votre compte a été activé avec succès');
+        router.replace('/(auth)/login');
       } else if (verificationType === 'reset-password') {
-        const response = await resetPasswordOtp({
-          otp: otpString,
-          identifier,
-        }).unwrap();
-
-        dispatch(
-          setOtpVerification({
-            isRequired: false,
-            identifier: '',
-            type: undefined,
-          })
-        );
-
-        // Navigate to reset password screen with token
-        router.push({
-          pathname: '/(auth)/reset-password',
-          params: { token: otpString },
-        });
+        router.push('/(auth)/reset-password');
+      } else {
+        // Login successful - user will be redirected automatically
       }
     } catch (error: any) {
       console.error('OTP verification error:', error);
@@ -151,11 +144,13 @@ export default function OtpVerificationScreen() {
     <View className="flex-1 bg-white p-6 justify-center">
       <View className="items-center mb-8">
         <Image
-          source={require('../../../assets/images/otp-verification.png')}
+          source={require('../../assets/images/logo.png')}
           style={{ width: 150, height: 150 }}
           resizeMode="contain"
         />
-        <Text className="text-2xl font-bold text-gray-800 mt-4">Vérification du code</Text>
+        <Text className="text-2xl font-bold text-gray-800 mt-4">
+          Vérification du code
+        </Text>
         <Text className="text-gray-600 text-center mt-2">
           Nous avons envoyé un code OTP à {'\n'}
           {identifier}

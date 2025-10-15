@@ -1,5 +1,6 @@
+// app/_layout.tsx
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack } from 'expo-router';
+import { Redirect, SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { View } from 'react-native';
@@ -68,18 +69,16 @@ function RootLayoutContent() {
   return (
     <View className="flex-1">
       <StatusBar style="dark" />
+      
+      {/* Add this to redirect to login by default */}
+      {!isAuthenticated && <Redirect href="/(auth)/login" />}
+      
       <Stack screenOptions={{ headerShown: false }}>
-        {!isAuthenticated ? (
-          // Auth routes
-          <>
-            <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/otp-verification" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/forgot-password" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/reset-password" options={{ headerShown: false }} />
-          </>
-        ) : (
-          // Role-based routes
+        {/* Auth routes - always define them */}
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        
+        {/* Role-based routes - conditionally include them */}
+        {isAuthenticated && (
           <>
             {user?.role === 'customer' && (
               <Stack.Screen name="(customer)" options={{ headerShown: false }} />
