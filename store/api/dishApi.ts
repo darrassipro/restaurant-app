@@ -13,6 +13,7 @@ export const dishApi = apiSlice.injectEndpoints({
     getDishById: builder.query<Dish, number>({
       query: (id) => `/dishes/${id}`,
       providesTags: (result, error, id) => [{ type: 'Dish', id }],
+      transformResponse: (response: { status: string; data: Dish }) => response.data,
     }),
     getDishesByCategory: builder.query<Dish[], number>({
       query: (categoryId) => `/dishes/category/${categoryId}`,
@@ -20,17 +21,19 @@ export const dishApi = apiSlice.injectEndpoints({
         result
           ? [...result.map(({ id }) => ({ type: 'Dish' as const, id })), 'Dish']
           : ['Dish'],
+      transformResponse: (response: { status: string; data: Dish[] }) => response.data,
     }),
-    createDish: builder.mutation<{ message: string; dish: Dish }, FormData>({
+    createDish: builder.mutation<Dish, FormData>({
       query: (formData) => ({
         url: '/dishes',
         method: 'POST',
         body: formData,
-        formData: true, // Important for sending files
+        formData: true,
       }),
       invalidatesTags: ['Dish'],
+      transformResponse: (response: { status: string; message: string; data: Dish }) => response.data,
     }),
-    updateDish: builder.mutation<{ message: string; dish: Partial<Dish> }, { id: number; formData: FormData }>({
+    updateDish: builder.mutation<Dish, { id: number; formData: FormData }>({
       query: ({ id, formData }) => ({
         url: `/dishes/${id}`,
         method: 'PUT',
@@ -38,6 +41,7 @@ export const dishApi = apiSlice.injectEndpoints({
         formData: true,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Dish', id }, 'Dish'],
+      transformResponse: (response: { status: string; message: string; data: Dish }) => response.data,
     }),
     deleteDish: builder.mutation<{ message: string }, number>({
       query: (id) => ({

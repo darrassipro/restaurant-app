@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useGetAddressesQuery } from '../../store/api/addressApi';
-import { Address } from '../../types/restaurant';
+import { Address } from '../../types/address';
 import Button from '../ui/Button';
 import Modal from '../ui/Modal';
 
@@ -15,9 +15,9 @@ interface AddressSelectorProps {
 
 const AddressSelector = ({ selectedAddressId, onSelectAddress }: AddressSelectorProps) => {
   const [modalVisible, setModalVisible] = useState(false);
-  
   const { data: addresses, isLoading } = useGetAddressesQuery();
-
+  
+  // Fixed: addresses is now the transformed array directly
   const selectedAddress = addresses?.find(address => address.id === selectedAddressId);
 
   const handleAddNewAddress = () => {
@@ -33,7 +33,6 @@ const AddressSelector = ({ selectedAddressId, onSelectAddress }: AddressSelector
   return (
     <View className="mb-4">
       <Text className="text-gray-700 font-medium mb-2">Adresse de livraison</Text>
-      
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         className="border border-gray-300 rounded-md p-3"
@@ -59,7 +58,7 @@ const AddressSelector = ({ selectedAddressId, onSelectAddress }: AddressSelector
           </View>
         )}
       </TouchableOpacity>
-      
+
       <Modal
         isVisible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -101,7 +100,6 @@ const AddressSelector = ({ selectedAddressId, onSelectAddress }: AddressSelector
               <Text className="text-gray-500 mb-4">Aucune adresse trouvée</Text>
             </View>
           )}
-          
           <Button
             title="Ajouter une nouvelle adresse"
             onPress={handleAddNewAddress}
