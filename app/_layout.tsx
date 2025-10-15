@@ -34,7 +34,7 @@ function RootLayoutContent() {
   const user = useSelector(selectUser);
   const isLoading = useSelector(selectIsLoading);
   const dispatch = useDispatch();
-  
+
   const { data, isLoading: isLoadingUser } = useGetCurrentUserQuery(undefined, {
     skip: !isAuthenticated,
   });
@@ -42,9 +42,7 @@ function RootLayoutContent() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Just wait a bit to show the splash screen
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
         if (isLoadingUser) return;
         dispatch(setLoading(false));
       } catch (error) {
@@ -63,23 +61,26 @@ function RootLayoutContent() {
   }, [isLoading]);
 
   if (isLoading) {
-    return null; // Keep showing splash screen
+    return null;
   }
 
   return (
     <View className="flex-1">
       <StatusBar style="dark" />
       
-      {/* Add this to redirect to login by default */}
-      {!isAuthenticated && <Redirect href="/(auth)/login" />}
-      
       <Stack screenOptions={{ headerShown: false }}>
-        {/* Auth routes - always define them */}
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        
-        {/* Role-based routes - conditionally include them */}
-        {isAuthenticated && (
+        {/* Auth Stack - Always available when not authenticated */}
+        {!isAuthenticated ? (
           <>
+            <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)/forgot-password" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)/otp-verification" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)/reset-password" options={{ headerShown: false }} />
+          </>
+        ) : (
+          <>
+            {/* Role-based routing */}
             {user?.role === 'customer' && (
               <Stack.Screen name="(customer)" options={{ headerShown: false }} />
             )}
@@ -94,7 +95,24 @@ function RootLayoutContent() {
             )}
           </>
         )}
+        
+        {/* Modal and other screens */}
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
+
+      {/* Redirect to login if not authenticated */}
+      {!isAuthenticated && <Redirect href="/(auth)/login" />}
+      
+      {/* Redirect to appropriate home based on role */}
+      {isAuthenticated && user && (
+        <>
+          {user.role === 'customer' && <Redirect href="/(customer)/home" />}
+          {user.role === 'admin' && <Redirect href="/(admin)/dashboard" />}
+          {user.role === 'manager' && <Redirect href="/(manager)/orders" />}
+          {user.role === 'chef' && <Redirect href="/(chef)/kitchen" />}
+        </>
+      )}
     </View>
   );
 }
