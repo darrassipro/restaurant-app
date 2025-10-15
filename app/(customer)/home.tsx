@@ -13,6 +13,7 @@ import { useGetRestaurantQuery } from '../../store/api/restaurantApi';
 import { formatCurrency } from '../../utils/formatters';
 
 
+
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   
@@ -57,7 +58,7 @@ export default function HomeScreen() {
     } as never);
   };
 
-  const restaurant: Restaurant | undefined = restaurantData?.data;
+  const restaurant: Restaurant | undefined = restaurantData;
   const categories: Category[] = categoriesData?.data || [];
 
   return (

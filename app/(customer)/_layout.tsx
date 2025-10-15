@@ -1,3 +1,4 @@
+// app/(customer)/_layout.tsx
 import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 
@@ -6,6 +7,7 @@ export default function CustomerTabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#FF5733',
+        headerShown: false,
       }}
     >
       <Tabs.Screen
@@ -34,6 +36,13 @@ export default function CustomerTabLayout() {
         options={{
           title: 'Profil',
           tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
+        }}
+      />
+      {/* Hide these from tab bar */}
+      <Tabs.Screen
+        name="dish"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
