@@ -1,11 +1,11 @@
-// app/screens/Customer/CartScreen.tsx
+// app/(customer)/cart.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import Button from '../../../components/ui/Button';
-import { useGetRestaurantQuery } from '../../../store/api/restaurantApi';
+import Button from '../../components/ui/Button';
+import { useGetRestaurantQuery } from '../../store/api/restaurantApi';
 import {
     clearCart,
     removeFromCart,
@@ -15,34 +15,29 @@ import {
     selectGrandTotal,
     selectTaxAmount,
     updateQuantity
-} from '../../../store/slices/cartSlice';
-import { formatCurrency } from '../../../utils/formatters';
+} from '../../store/slices/cartSlice';
+import { formatCurrency } from '../../utils/formatters';
 
 export default function CartScreen() {
   const dispatch = useDispatch();
-  
   const cartItems = useSelector(selectCartItems);
   const subtotal = useSelector(selectCartTotal);
   const deliveryFee = useSelector(selectDeliveryFee);
   const taxAmount = useSelector(selectTaxAmount);
   const grandTotal = useSelector(selectGrandTotal);
-  
+
   const { data: restaurantData } = useGetRestaurantQuery();
-  const restaurant = restaurantData?.data;
+  const restaurant = restaurantData;
 
   const handleQuantityChange = (id: number, quantity: number) => {
     if (quantity <= 0) {
-      // Confirm deletion
       Alert.alert(
         "Supprimer l'article",
         "Voulez-vous supprimer cet article de votre panier ?",
         [
+          { text: "Annuler", style: "cancel" },
           {
-            text: "Annuler",
-            style: "cancel"
-          },
-          { 
-            text: "Supprimer", 
+            text: "Supprimer",
             onPress: () => dispatch(removeFromCart(id)),
             style: "destructive"
           }
@@ -50,7 +45,6 @@ export default function CartScreen() {
       );
       return;
     }
-    
     dispatch(updateQuantity({ id, quantity }));
   };
 
@@ -59,15 +53,8 @@ export default function CartScreen() {
       "Vider le panier",
       "Êtes-vous sûr de vouloir vider votre panier ?",
       [
-        {
-          text: "Annuler",
-          style: "cancel"
-        },
-        { 
-          text: "Vider", 
-          onPress: () => dispatch(clearCart()),
-          style: "destructive"
-        }
+        { text: "Annuler", style: "cancel" },
+        { text: "Vider", onPress: () => dispatch(clearCart()), style: "destructive" }
       ]
     );
   };
@@ -77,7 +64,7 @@ export default function CartScreen() {
       Alert.alert("Panier vide", "Ajoutez des articles à votre panier avant de passer commande.");
       return;
     }
-    
+
     if (restaurant && subtotal < parseFloat(restaurant.minimumOrder)) {
       Alert.alert(
         "Commande minimum non atteinte",
@@ -85,13 +72,12 @@ export default function CartScreen() {
       );
       return;
     }
-    
-    router.push('/(customer)/checkout' as never);
+
+    router.push('/checkout' as never);
   };
 
   return (
     <View className="flex-1 bg-gray-50">
-      {/* Cart Items */}
       {cartItems.length > 0 ? (
         <>
           <ScrollView className="flex-1">
@@ -106,11 +92,11 @@ export default function CartScreen() {
                     className="w-20 h-20 rounded-md"
                     resizeMode="cover"
                   />
-                  
                   <View className="flex-1 ml-3">
                     <Text className="text-lg font-medium">{item.dish.nameFr}</Text>
-                    <Text className="text-primary font-bold">{formatCurrency(item.dish.price)}</Text>
-                    
+                    <Text className="text-primary font-bold">
+                      {formatCurrency(item.dish.price)}
+                    </Text>
                     <View className="flex-row items-center justify-between mt-2">
                       <View className="flex-row items-center">
                         <TouchableOpacity
@@ -119,9 +105,7 @@ export default function CartScreen() {
                         >
                           <Feather name="minus" size={18} color="#333" />
                         </TouchableOpacity>
-                        
                         <Text className="mx-3 text-base font-medium">{item.quantity}</Text>
-                        
                         <TouchableOpacity
                           onPress={() => handleQuantityChange(item.id, item.quantity + 1)}
                           className="bg-gray-200 w-8 h-8 rounded-full items-center justify-center"
@@ -129,7 +113,6 @@ export default function CartScreen() {
                           <Feather name="plus" size={18} color="#333" />
                         </TouchableOpacity>
                       </View>
-                      
                       <TouchableOpacity
                         onPress={() => dispatch(removeFromCart(item.id))}
                         className="p-2"
@@ -140,7 +123,7 @@ export default function CartScreen() {
                   </View>
                 </View>
               ))}
-              
+
               {restaurant && subtotal < parseFloat(restaurant.minimumOrder) && (
                 <View className="bg-yellow-100 p-3 rounded-md mb-4">
                   <Text className="text-yellow-800">
@@ -150,8 +133,7 @@ export default function CartScreen() {
               )}
             </View>
           </ScrollView>
-          
-          {/* Order Summary */}
+
           <View className="bg-white p-4 border-t border-gray-200">
             <TouchableOpacity
               onPress={handleClearCart}
@@ -160,27 +142,25 @@ export default function CartScreen() {
               <Feather name="trash" size={16} color="#FF5733" />
               <Text className="text-primary ml-1">Vider le panier</Text>
             </TouchableOpacity>
-            
+
             <View className="flex-row justify-between mb-2">
               <Text className="text-gray-600">Sous-total</Text>
               <Text className="font-medium">{formatCurrency(subtotal)}</Text>
             </View>
-            
             <View className="flex-row justify-between mb-2">
               <Text className="text-gray-600">Frais de livraison</Text>
               <Text className="font-medium">{formatCurrency(deliveryFee)}</Text>
             </View>
-            
             <View className="flex-row justify-between mb-4">
               <Text className="text-gray-600">TVA</Text>
               <Text className="font-medium">{formatCurrency(taxAmount)}</Text>
             </View>
-            
             <View className="flex-row justify-between mb-4">
               <Text className="text-lg font-bold">Total</Text>
-              <Text className="text-lg font-bold text-primary">{formatCurrency(grandTotal)}</Text>
+              <Text className="text-lg font-bold text-primary">
+                {formatCurrency(grandTotal)}
+              </Text>
             </View>
-            
             <Button
               title="Commander"
               onPress={handleCheckout}
@@ -192,7 +172,9 @@ export default function CartScreen() {
       ) : (
         <View className="flex-1 justify-center items-center p-6">
           <Feather name="shopping-cart" size={80} color="#ccc" />
-          <Text className="text-xl font-medium text-gray-800 mt-4">Votre panier est vide</Text>
+          <Text className="text-xl font-medium text-gray-800 mt-4">
+            Votre panier est vide
+          </Text>
           <Text className="text-gray-500 text-center mt-2 mb-6">
             Explorez notre menu et ajoutez des plats délicieux à votre panier
           </Text>

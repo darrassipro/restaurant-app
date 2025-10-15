@@ -1,22 +1,16 @@
-// app/screens/Customer/OrderHistoryScreen.tsx
+// app/(chef)/orders.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux';
-import { useGetCustomerOrdersQuery } from '../../../store/api/orderApi';
-import { selectUser } from '../../../store/slices/authSlice';
-import { Order } from '../../../types/order';
-import { ORDER_STATUS } from '../../../utils/constants';
-import { formatCurrency, formatDate } from '../../../utils/formatters';
+import { useGetRestaurantOrdersQuery } from '../../store/api/orderApi';
+import { Order } from '../../types/order';
+import { ORDER_STATUS } from '../../utils/constants';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
-export default function OrderHistoryScreen() {
-  const user = useSelector(selectUser);
+export default function ChefOrdersScreen() {
   const [refreshing, setRefreshing] = useState(false);
-
-  const { data: ordersData, isLoading, refetch } = useGetCustomerOrdersQuery(user?.id || 0, {
-    skip: !user?.id,
-  });
+  const { data: ordersData, isLoading, refetch } = useGetRestaurantOrdersQuery();
 
   const orders: Order[] = ordersData?.data || [];
 
@@ -27,7 +21,7 @@ export default function OrderHistoryScreen() {
   };
 
   const navigateToOrderDetails = (orderId: number) => {
-    router.push({ pathname: '/order-details/[id]', params: { id: orderId } } as never);
+    router.push({ pathname: '/(chef)/order-details/[id]', params: { id: orderId } } as never);
   };
 
   const getStatusColor = (status: string) => {
@@ -54,38 +48,34 @@ export default function OrderHistoryScreen() {
         </View>
         <Text className="font-bold text-primary">{formatCurrency(item.total)}</Text>
       </View>
-
       <View className="flex-row justify-between items-center mb-2">
         <Text className="text-gray-600">
           {item.items?.length || 0} article{item.items?.length !== 1 ? 's' : ''}
         </Text>
         <Text className="text-gray-600">{formatDate(item.createdAt)}</Text>
       </View>
-
-      {item.Restaurant && (
+      {item.User && (
         <View className="flex-row items-center">
-          <Feather name="home" size={14} color="#666" />
-          <Text className="text-gray-700 ml-1">{item.Restaurant.name}</Text>
+          <Feather name="user" size={14} color="#666" />
+          <Text className="text-gray-700 ml-1">
+            {item.User.firstName} {item.User.lastName}
+          </Text>
         </View>
       )}
     </TouchableOpacity>
   );
 
-  if (isLoading && !refreshing) {
-    return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
-        <ActivityIndicator size="large" color="#FF5733" />
-      </View>
-    );
-  }
-
   return (
     <View className="flex-1 bg-gray-50">
       <View className="bg-white p-4 shadow-sm">
-        <Text className="text-2xl font-bold text-gray-800">Historique des commandes</Text>
+        <Text className="text-2xl font-bold text-gray-800">Toutes les commandes</Text>
       </View>
 
-      {orders.length > 0 ? (
+      {isLoading && !refreshing ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#FF5733" />
+        </View>
+      ) : orders.length > 0 ? (
         <FlatList
           data={orders}
           keyExtractor={(item) => item.id.toString()}
@@ -97,12 +87,10 @@ export default function OrderHistoryScreen() {
         />
       ) : (
         <View className="flex-1 justify-center items-center p-6">
-          <Feather name="shopping-bag" size={80} color="#ccc" />
-          <Text className="text-xl font-medium text-gray-800 mt-4">
-            Aucune commande
-          </Text>
+          <Feather name="inbox" size={80} color="#ccc" />
+          <Text className="text-xl font-medium text-gray-800 mt-4">Aucune commande</Text>
           <Text className="text-gray-500 text-center mt-2">
-            Vous n'avez pas encore passé de commande
+            Les commandes apparaîtront ici
           </Text>
         </View>
       )}

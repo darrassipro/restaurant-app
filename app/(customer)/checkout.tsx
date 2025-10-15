@@ -1,24 +1,24 @@
-// app/screens/Customer/CheckoutScreen.tsx
+// app/(customer)/checkout.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import AddressSelector from '../../../components/features/AddressSelector';
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
-import { useCreateOrderMutation } from '../../../store/api/orderApi';
-import { useGetRestaurantQuery } from '../../../store/api/restaurantApi';
+import AddressSelector from '../../components/features/AddressSelector';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import { useCreateOrderMutation } from '../../store/api/orderApi';
+import { useGetRestaurantQuery } from '../../store/api/restaurantApi';
 import {
-  clearCart,
-  selectCartItems,
-  selectCartTotal,
-  selectDeliveryFee,
-  selectGrandTotal,
-  selectTaxAmount,
-  setDeliveryFee,
-} from '../../../store/slices/cartSlice';
-import { formatCurrency } from '../../../utils/formatters';
+    clearCart,
+    selectCartItems,
+    selectCartTotal,
+    selectDeliveryFee,
+    selectGrandTotal,
+    selectTaxAmount,
+    setDeliveryFee,
+} from '../../store/slices/cartSlice';
+import { formatCurrency } from '../../utils/formatters';
 
 export default function CheckoutScreen() {
   const dispatch = useDispatch();
@@ -30,12 +30,11 @@ export default function CheckoutScreen() {
 
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [notes, setNotes] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'cod'>('cod');
+  const [paymentMethod] = useState<'cod'>('cod');
 
   const { data: restaurantData } = useGetRestaurantQuery();
   const [createOrder, { isLoading }] = useCreateOrderMutation();
 
-  // Set delivery fee when restaurant data is loaded
   useEffect(() => {
     if (restaurantData?.deliveryFee) {
       dispatch(setDeliveryFee(parseFloat(restaurantData.deliveryFee)));
@@ -53,7 +52,6 @@ export default function CheckoutScreen() {
       return;
     }
 
-    // Check minimum order if restaurant data exists
     if (restaurantData?.minimumOrder && subtotal < parseFloat(restaurantData.minimumOrder)) {
       Alert.alert(
         'Commande minimum non atteinte',
@@ -73,7 +71,6 @@ export default function CheckoutScreen() {
       };
 
       const response = await createOrder(orderData).unwrap();
-
       dispatch(clearCart());
       router.push({
         pathname: '/order-success',
@@ -83,10 +80,9 @@ export default function CheckoutScreen() {
         },
       } as never);
     } catch (error: any) {
-      console.error('Order creation error:', error);
       Alert.alert(
         'Erreur',
-        error?.data?.message || 'Une erreur est survenue lors de la création de votre commande. Veuillez réessayer.'
+        error?.data?.message || 'Une erreur est survenue lors de la création de votre commande.'
       );
     }
   };
@@ -95,13 +91,11 @@ export default function CheckoutScreen() {
     <View className="flex-1 bg-gray-50">
       <ScrollView className="flex-1">
         <View className="p-4">
-          {/* Delivery Address */}
           <AddressSelector
             selectedAddressId={selectedAddressId}
             onSelectAddress={(address) => setSelectedAddressId(address.id ?? null)}
           />
 
-          {/* Order Items */}
           <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <Text className="text-lg font-bold mb-3">Votre commande</Text>
             {cartItems.map((item) => (
@@ -120,28 +114,21 @@ export default function CheckoutScreen() {
             ))}
           </View>
 
-          {/* Payment Method */}
           <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <Text className="text-lg font-bold mb-3">Mode de paiement</Text>
             <TouchableOpacity
               className="flex-row items-center justify-between p-3 bg-gray-100 rounded-md"
-              onPress={() => setPaymentMethod('cod')}
             >
               <View className="flex-row items-center">
                 <Feather name="dollar-sign" size={20} color="#333" />
                 <Text className="text-gray-800 ml-2">Paiement à la livraison</Text>
               </View>
-              <View
-                className={`w-6 h-6 rounded-full border-2 ${
-                  paymentMethod === 'cod' ? 'border-primary' : 'border-gray-400'
-                } items-center justify-center`}
-              >
-                {paymentMethod === 'cod' && <View className="w-3 h-3 rounded-full bg-primary" />}
+              <View className="w-6 h-6 rounded-full border-2 border-primary items-center justify-center">
+                <View className="w-3 h-3 rounded-full bg-primary" />
               </View>
             </TouchableOpacity>
           </View>
 
-          {/* Order Notes */}
           <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <Text className="text-lg font-bold mb-3">Notes de commande</Text>
             <Input
@@ -153,7 +140,6 @@ export default function CheckoutScreen() {
             />
           </View>
 
-          {/* Order Summary */}
           <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <Text className="text-lg font-bold mb-3">Récapitulatif</Text>
             <View className="flex-row justify-between mb-2">
@@ -171,13 +157,14 @@ export default function CheckoutScreen() {
             <View className="border-t border-gray-200 my-2" />
             <View className="flex-row justify-between">
               <Text className="text-lg font-bold">Total</Text>
-              <Text className="text-lg font-bold text-primary">{formatCurrency(grandTotal)}</Text>
+              <Text className="text-lg font-bold text-primary">
+                {formatCurrency(grandTotal)}
+              </Text>
             </View>
           </View>
         </View>
       </ScrollView>
 
-      {/* Place Order Button */}
       <View className="bg-white p-4 border-t border-gray-200">
         <Button
           title={isLoading ? 'Traitement...' : 'Commander'}

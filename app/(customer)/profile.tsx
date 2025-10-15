@@ -1,11 +1,11 @@
-// app/screens/Customer/ProfileScreen.tsx
+// app/(customer)/profile.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { useAuth } from '../../../hooks/useAuth';
-import { selectUser } from '../../../store/slices/authSlice';
+import { useAuth } from '../../hooks/useAuth';
+import { selectUser } from '../../store/slices/authSlice';
 
 export default function ProfileScreen() {
   const user = useSelector(selectUser);
@@ -16,15 +16,8 @@ export default function ProfileScreen() {
       "Déconnexion",
       "Êtes-vous sûr de vouloir vous déconnecter ?",
       [
-        {
-          text: "Annuler",
-          style: "cancel"
-        },
-        {
-          text: "Déconnexion",
-          onPress: logout,
-          style: "destructive"
-        }
+        { text: "Annuler", style: "cancel" },
+        { text: "Déconnexion", onPress: logout, style: "destructive" }
       ]
     );
   };
@@ -58,11 +51,13 @@ export default function ProfileScreen() {
             <Feather name="user" size={22} color="#FF5733" />
             <View className="ml-3 flex-1">
               <Text className="font-medium text-gray-800">Modifier le profil</Text>
-              <Text className="text-gray-500 text-sm">Modifier vos informations personnelles</Text>
+              <Text className="text-gray-500 text-sm">
+                Modifier vos informations personnelles
+              </Text>
             </View>
             <Feather name="chevron-right" size={22} color="#999" />
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             onPress={() => navigateTo('/address-book')}
             className="flex-row items-center p-4 border-b border-gray-100"
@@ -70,11 +65,13 @@ export default function ProfileScreen() {
             <Feather name="map-pin" size={22} color="#FF5733" />
             <View className="ml-3 flex-1">
               <Text className="font-medium text-gray-800">Adresses</Text>
-              <Text className="text-gray-500 text-sm">Gérer vos adresses de livraison</Text>
+              <Text className="text-gray-500 text-sm">
+                Gérer vos adresses de livraison
+              </Text>
             </View>
             <Feather name="chevron-right" size={22} color="#999" />
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             onPress={() => navigateTo('/order-history')}
             className="flex-row items-center p-4"
@@ -82,12 +79,14 @@ export default function ProfileScreen() {
             <Feather name="shopping-bag" size={22} color="#FF5733" />
             <View className="ml-3 flex-1">
               <Text className="font-medium text-gray-800">Commandes</Text>
-              <Text className="text-gray-500 text-sm">Voir l'historique de vos commandes</Text>
+              <Text className="text-gray-500 text-sm">
+                Voir l'historique de vos commandes
+              </Text>
             </View>
             <Feather name="chevron-right" size={22} color="#999" />
           </TouchableOpacity>
         </View>
-        
+
         <View className="bg-white rounded-lg shadow-sm overflow-hidden mt-4">
           <TouchableOpacity
             onPress={handleLogout}
@@ -97,7 +96,7 @@ export default function ProfileScreen() {
             <Text className="ml-3 font-medium text-gray-800">Déconnexion</Text>
           </TouchableOpacity>
         </View>
-        
+
         {/* App Info */}
         <View className="items-center mt-6">
           <Text className="text-gray-500">Le Gourmet - Version 1.0.0</Text>

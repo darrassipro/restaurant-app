@@ -1,21 +1,18 @@
-// app/screens/Customer/AddressBookScreen.tsx
+// app/(customer)/address-book.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import Button from '../../../components/ui/Button';
-import { useDeleteAddressMutation, useGetAddressesQuery } from '../../../store/api/addressApi';
-import { Address } from '../../../types/address';
+import Button from '../../components/ui/Button';
+import { useDeleteAddressMutation, useGetAddressesQuery } from '../../store/api/addressApi';
+import { Address } from '../../types/address';
 
 export default function AddressBookScreen() {
   const { data: addresses, isLoading, refetch } = useGetAddressesQuery();
   const [deleteAddress, { isLoading: isDeleting }] = useDeleteAddressMutation();
 
   const handleEditAddress = (addressId: number) => {
-    router.push({
-      pathname: '/add-edit-address',
-      params: { addressId }
-    } as never);
+    router.push({ pathname: '/add-edit-address', params: { addressId } } as never);
   };
 
   const handleAddAddress = () => {
@@ -26,7 +23,7 @@ export default function AddressBookScreen() {
     if (isDefault) {
       Alert.alert(
         "Impossible de supprimer",
-        "Vous ne pouvez pas supprimer une adresse par défaut. Veuillez définir une autre adresse par défaut d'abord.",
+        "Vous ne pouvez pas supprimer une adresse par défaut.",
         [{ text: "OK" }]
       );
       return;
@@ -36,10 +33,7 @@ export default function AddressBookScreen() {
       "Supprimer l'adresse",
       "Êtes-vous sûr de vouloir supprimer cette adresse ?",
       [
-        { 
-          text: "Annuler", 
-          style: "cancel" 
-        },
+        { text: "Annuler", style: "cancel" },
         {
           text: "Supprimer",
           style: "destructive",
@@ -48,8 +42,7 @@ export default function AddressBookScreen() {
               await deleteAddress(addressId).unwrap();
               refetch();
             } catch (error) {
-              console.error('Delete address error:', error);
-              Alert.alert("Erreur", "Une erreur est survenue lors de la suppression de l'adresse");
+              Alert.alert("Erreur", "Impossible de supprimer l'adresse");
             }
           }
         }
@@ -69,11 +62,9 @@ export default function AddressBookScreen() {
               </View>
             )}
           </View>
-          
           <Text className="text-gray-700 mt-1">{item.addressName}</Text>
           <Text className="text-gray-700">{item.sector}, {item.city}</Text>
           <Text className="text-gray-700 mt-1">{item.contactPhone}</Text>
-          
           {item.deliveryInstructions && (
             <View className="mt-2">
               <Text className="text-gray-600">Instructions:</Text>
@@ -81,7 +72,6 @@ export default function AddressBookScreen() {
             </View>
           )}
         </View>
-        
         <View className="flex-row">
           <TouchableOpacity
             onPress={() => handleEditAddress(item.id || 0)}
@@ -89,7 +79,6 @@ export default function AddressBookScreen() {
           >
             <Feather name="edit" size={20} color="#2196F3" />
           </TouchableOpacity>
-          
           <TouchableOpacity
             onPress={() => handleDeleteAddress(item.id || 0, item.isDefault || false)}
             className="p-2"
@@ -109,7 +98,7 @@ export default function AddressBookScreen() {
         </View>
       ) : addresses && addresses.length > 0 ? (
         <FlatList
-          data={null}
+          data={addresses}
           keyExtractor={(item) => (item.id ? item.id.toString() : Math.random().toString())}
           renderItem={renderAddressItem}
           contentContainerStyle={{ paddingVertical: 8 }}
@@ -119,13 +108,14 @@ export default function AddressBookScreen() {
       ) : (
         <View className="flex-1 justify-center items-center p-6">
           <Feather name="map-pin" size={60} color="#ccc" />
-          <Text className="text-xl font-medium text-gray-700 mt-4">Aucune adresse enregistrée</Text>
+          <Text className="text-xl font-medium text-gray-700 mt-4">
+            Aucune adresse enregistrée
+          </Text>
           <Text className="text-gray-500 text-center mt-2 mb-6">
             Ajoutez une adresse de livraison pour faciliter vos commandes
           </Text>
         </View>
       )}
-      
       <View className="p-4">
         <Button
           title="Ajouter une nouvelle adresse"
