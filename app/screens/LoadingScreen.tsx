@@ -1,4 +1,3 @@
-import { styled } from 'nativewind';
 import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
@@ -11,4 +10,4 @@ const LoadingScreen = () => {
   );
 };
 
-export default styled(LoadingScreen);
+export default LoadingScreen;

@@ -1,4 +1,3 @@
-import { styled } from 'nativewind';
 import React from 'react';
 import { Dimensions, View } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
@@ -50,4 +49,4 @@ const SalesChart = ({ data }: SalesChartProps) => {
   );
 };
 
-export default styled(SalesChart);
+export default SalesChart;

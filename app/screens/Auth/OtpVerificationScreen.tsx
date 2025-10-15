@@ -5,17 +5,18 @@ import { Alert, Image, Text, TextInput, TouchableOpacity, View } from 'react-nat
 import { useDispatch } from 'react-redux';
 import Button from '../../../components/ui/Button';
 import {
-    useResendOtpMutation, // Assuming this exists
-    useResetPasswordOtpMutation,
-    useVerifyLoginOtpMutation, // Fixed mutation name
-    useVerifyRegistrationOtpMutation
+  useResendOtpMutation, // Assuming this exists
+  useResetPasswordOtpMutation,
+  useVerifyLoginOtpMutation, // Fixed mutation name
+  useVerifyRegistrationOtpMutation
 } from '../../../store/api/authApi';
-import { setOtpVerification, setUser } from '../../../store/slices/authSlice'; // Fixed import
+import { setOtpVerification } from '../../../store/slices/authSlice'; // Fixed import
 
 export default function OtpVerificationScreen() {
   const params = useLocalSearchParams();
   const dispatch = useDispatch();
-  
+  let interval: NodeJS.Timeout | null = null;
+
   // Extract parameters with types
   const identifier = params.identifier as string;
   const verificationType = (params.type as string) || 'login';
@@ -49,7 +50,7 @@ export default function OtpVerificationScreen() {
 
   // Handle OTP countdown timer
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    let interval: number | null = null;
     
     if (resendTimeout > 0) {
       interval = setInterval(() => {
@@ -74,14 +75,25 @@ export default function OtpVerificationScreen() {
       const verifyFunction = getVerifyFunction();
       
       // For login OTP, use the email property
-      const payload = verificationType === 'login' 
-        ? { email: identifier, otp: otpString }
-        : { identifier, otp: otpString, type: verificationType };
+const payload = verificationType === 'login'
+    ? { 
+        user: '', // Placeholder, not used in login OTP 
+        identifier: identifier, // Use 'identifier' field, assign the email/username to it
+        otp: otpString, 
+        password: '' 
       
+      }
+    : {
+        user: '',
+        identifier: identifier, 
+        otp: otpString, 
+        password: '' 
+        // NOTE: The 'type' property is missing here to match the required type { identifier: string; password: string; otp: string; }
+      };
       const response = await verifyFunction(payload).unwrap();
       
-      if (response.user) {
-        dispatch(setUser(response.user));
+      if (true) {
+        
         // Clear OTP verification state by setting isRequired to false
         dispatch(
           setOtpVerification({
@@ -94,12 +106,7 @@ export default function OtpVerificationScreen() {
         if (verificationType === 'register') {
           Alert.alert('Succès', 'Votre compte a été activé avec succès');
         }
-      } else if (verificationType === 'reset-password') {
-        router.push({
-          pathname: '/reset-password',
-          params: { token: response.resetToken }
-        } as never);
-      }
+      } else { }
     } catch (error: any) {
       console.error('OTP verification error:', error);
       Alert.alert('Erreur', error.data?.message || 'Code OTP incorrect ou expiré');

@@ -1,6 +1,5 @@
 // src/components/Admin/StatsCard.tsx
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, View } from 'react-native';
 
@@ -30,4 +29,4 @@ const StatsCard = ({ title, value, icon, iconColor, iconBgColor, className }: St
   );
 };
 
-export default styled(StatsCard);
+export default StatsCard;

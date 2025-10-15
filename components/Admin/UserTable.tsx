@@ -1,5 +1,4 @@
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { User } from '../../types/auth';
@@ -104,4 +103,4 @@ const UserTable = ({ users, isLoading, onEditUser, onDeleteUser, onRefresh }: Us
   );
 };
 
-export default styled(UserTable);
+export default UserTable;

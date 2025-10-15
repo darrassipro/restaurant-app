@@ -1,7 +1,6 @@
 // app/screens/Admin/RecentOrders.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { styled } from 'nativewind';
 import React from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { ORDER_STATUS } from '../../../utils/constants';
@@ -108,4 +107,4 @@ const RecentOrders = ({ orders, limit = 5, showViewAll = true }: RecentOrdersPro
   );
 };
 
-export default styled(RecentOrders);
+export default RecentOrders;

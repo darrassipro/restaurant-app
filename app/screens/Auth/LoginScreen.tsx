@@ -1,14 +1,13 @@
 // src/screens/Auth/LoginScreen.tsx
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { __DO_NOT_USE__ActionTypes } from '@reduxjs/toolkit';
 import React, { useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import Button from '../../../components/ui/Button
+import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import { useLoginMutation } from '../../../store/api/authApi';
 import { setOtpVerification, setUser } from '../../../store/slices/authSlice';
-import { __DO_NOT_USE__ActionTypes } from '@reduxjs/toolkit';
 
 //type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
 
@@ -90,7 +89,7 @@ const LoginScreen = () => {
         <View className="flex-1 p-6 bg-white justify-center">
           <View className="items-center mb-8">
             <Image
-              source={require('../../assets/images/logo.png')}
+              source={require('../../../assets/images/logo.png')}
               className="w-32 h-32"
               resizeMode="contain"
             />

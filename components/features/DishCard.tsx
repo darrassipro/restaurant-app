@@ -1,6 +1,5 @@
 // components/features/DishCard.tsx
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
@@ -163,4 +162,4 @@ const DishCard = ({
   );
 };
 
-export default styled(DishCard);
+export default DishCard;

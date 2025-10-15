@@ -1,6 +1,5 @@
 // components/Manager/TodaysSales.tsx
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { formatCurrency } from '../../utils/formatters';
@@ -36,4 +35,4 @@ const TodaysSales = ({ orderCount, revenue }: TodaysSalesProps) => {
   );
 };
 
-export default styled(TodaysSales);
+export default TodaysSales;

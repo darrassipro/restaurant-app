@@ -42,15 +42,14 @@ export default function ForgotPasswordScreen() {
     
     try {
       const response = await forgotPassword({
-        identifier,
-        type: identifierType,
+        email: identifierType === 'email' ? identifier : undefined,
       }).unwrap();
       
       dispatch(
         setOtpVerification({
           isRequired: true,
           identifier,
-          type: 'reset-password',
+          type: 'password_reset',
         })
       );
       
@@ -131,7 +130,8 @@ export default function ForgotPasswordScreen() {
           onChangeText={setIdentifier}
           keyboardType={identifierType === 'email' ? 'email-address' : 'phone-pad'}
           autoCapitalize={identifierType === 'email' ? 'none' : 'sentences'}
-          error={error}
+            error={error ?? undefined}
+
         />
         
         <Button

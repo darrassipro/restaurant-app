@@ -1,6 +1,5 @@
 // app/screens/Manager/OrdersOverview.tsx
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { ORDER_STATUS } from '../../../utils/constants';
@@ -80,4 +79,4 @@ const OrdersOverview = ({ ordersByStatus }: OrdersOverviewProps) => {
   );
 };
 
-export default styled(OrdersOverview);
+export default OrdersOverview;

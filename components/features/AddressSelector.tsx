@@ -1,7 +1,6 @@
 // components/features/AddressSelector.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { styled } from 'nativewind';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useGetAddressesQuery } from '../../store/api/addressApi';
@@ -116,4 +115,4 @@ const AddressSelector = ({ selectedAddressId, onSelectAddress }: AddressSelector
   );
 };
 
-export default styled(AddressSelector);
+export default AddressSelector;

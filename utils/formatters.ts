@@ -3,6 +3,9 @@ export const formatCurrency = (amount: string | number): string => {
   return num.toFixed(2) + ' MAD';
 };
 
+
+
+
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('fr-FR', {

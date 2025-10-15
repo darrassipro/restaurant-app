@@ -4,6 +4,27 @@ import { apiSlice } from './apiSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    verifyRegistrationOtp: builder.mutation<
+      { status: boolean; message: string },
+      { otp: string; identifier: string }
+    >({
+      query: ({ otp, identifier }) => ({
+        url: '/v1/auth/verify-registration-otp',
+        method: 'POST',
+        body: { otp, identifier },
+      }),
+    }),
+     // Réinitialiser OTP mot de passe
+    resetPasswordOtp: builder.mutation<
+      { status: boolean; message: string },
+      { otp: string; identifier: string }
+    >({
+      query: ({ otp, identifier }) => ({
+        url: '/v1/auth/reset-password-otp',
+        method: 'POST',
+        body: { otp, identifier },
+      }),
+    }),
     register: builder.mutation<AuthResponse, RegisterRequest>({
       query: (credentials) => ({
         url: '/auth/register',
@@ -39,7 +60,7 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    forgotPassword: builder.mutation<{ message: string }, { email: string }>({
+    forgotPassword: builder.mutation<{ message: string }, { email?: string }>({
       query: (data) => ({
         url: '/auth/forgot-password',
         method: 'POST',
@@ -91,6 +112,8 @@ export const authApi = apiSlice.injectEndpoints({
 });
 
 export const {
+  useVerifyRegistrationOtpMutation,
+  useResetPasswordOtpMutation,
   useRegisterMutation,
   useCompleteRegistrationMutation,
   useLoginMutation,

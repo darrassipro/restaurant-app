@@ -1,5 +1,4 @@
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, View } from 'react-native';
 
@@ -39,4 +38,4 @@ const ChefStats = ({ pendingCount, preparingCount, readyCount }: ChefStatsProps)
   );
 };
 
-export default styled(ChefStats);
+export default ChefStats;

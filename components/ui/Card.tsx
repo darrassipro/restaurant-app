@@ -1,4 +1,3 @@
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, View, ViewProps } from 'react-native';
 
@@ -42,4 +41,4 @@ const Card = ({
   );
 };
 
-export default styled(Card);
+export default Card;

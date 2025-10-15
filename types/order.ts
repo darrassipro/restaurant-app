@@ -31,7 +31,16 @@ export interface Order {
     sector: string;
   };
 }
+export type OrderStatusType = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+export type KitchenTab = 'pending' | 'preparing' | 'ready';
 
+export interface OrdersQueryParams {
+  status?: OrderStatusType | KitchenTab;
+  restaurantId?: number;
+  customerId?: number;
+  page?: number;
+  limit?: number;
+}
 export interface OrderItem {
   id: number;
   orderId: number;

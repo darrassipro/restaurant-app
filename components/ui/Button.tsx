@@ -1,4 +1,3 @@
-import { styled } from 'nativewind';
 import React from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
@@ -86,4 +85,4 @@ const Button = ({
   );
 };
 
-export default styled(Button);
+export default Button;

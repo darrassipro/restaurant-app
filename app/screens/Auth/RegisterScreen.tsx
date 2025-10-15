@@ -83,7 +83,7 @@ export default function RegisterScreen() {
           setOtpVerification({
             isRequired: true,
             identifier: response.identifier || formData.email,
-            type: 'register',
+            type: 'registration',
           })
         );
         

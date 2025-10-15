@@ -1,6 +1,5 @@
 // components/Chef/KitchenOrderCard.tsx
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Order } from '../../types/order';
@@ -133,7 +132,7 @@ const KitchenOrderCard = ({
         {order.items && order.items.map((item) => (
           <View key={item.id} className="flex-row justify-between mb-1">
             <Text className="text-gray-700">
-              {item.quantity} x {item.dishNameFr || item.Dish?.nameFr || `Article #${item.dishId}`}
+              {item.quantity} x {item.dishNameFr  || `Article #${item.dishId}`}
             </Text>
           </View>
         ))}
@@ -142,7 +141,7 @@ const KitchenOrderCard = ({
       {/* Order details */}
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-gray-600">
-          {formatDate(order.createdAt, true)}
+          {formatDate(order.createdAt)}
         </Text>
         <Text className="font-bold text-primary">{formatCurrency(order.total)}</Text>
       </View>
@@ -156,4 +155,4 @@ const KitchenOrderCard = ({
   );
 };
 
-export default styled(KitchenOrderCard);
+export default KitchenOrderCard;

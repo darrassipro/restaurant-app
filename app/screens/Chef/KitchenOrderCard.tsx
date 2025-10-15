@@ -1,9 +1,8 @@
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { Order } from '../../types/order';
-import { formatDate } from '../../utils/formatters';
+import { Order } from '../../../types/order';
+import { formatDate } from '../../../utils/formatters';
 
 interface KitchenOrderCardProps {
   order: Order;
@@ -95,4 +94,4 @@ const KitchenOrderCard = ({ order, onViewDetails, onUpdateStatus, currentTab }: 
   );
 };
 
-export default styled(KitchenOrderCard);
+export default KitchenOrderCard;

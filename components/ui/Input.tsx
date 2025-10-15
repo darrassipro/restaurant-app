@@ -26,7 +26,7 @@ const Input = ({
   onChangeText,
   secureTextEntry = false,
   keyboardType = 'default',
-  error,
+  error = '',
   disabled = false,
   multiline = false,
   numberOfLines = 1,

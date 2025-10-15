@@ -4,25 +4,18 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useGetUsersQuery } from '../../../store/api/userApi';
+import { User } from '../../../types/auth';
 
 // Define User type for better type safety
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  role: 'admin' | 'manager' | 'chef' | 'customer';
-  isActive: boolean;
-  createdAt: string;
-}
+
 
 export default function UsersScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string | null>(null);
   
-  const { data: usersData, isLoading, refetch } = useGetUsersQuery();
-  const users: User[] = usersData?.data || [];
+  const { data: usersData, isLoading, refetch } = useGetUsersQuery({});
+const users: User[] = usersData?.data?.users || [];
+
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = searchQuery === '' || 

@@ -1,5 +1,4 @@
 import { Feather } from '@expo/vector-icons';
-import { styled } from 'nativewind';
 import React, { useEffect } from 'react';
 import { Animated, Modal as RNModal, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 
@@ -80,4 +79,4 @@ const Modal = ({
   );
 };
 
-export default styled(Modal);
+export default Modal;

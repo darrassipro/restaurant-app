@@ -6,13 +6,17 @@ module.exports = {
     "./app/**/*.{js,jsx,ts,tsx}",
     "./components/**/*.{js,jsx,ts,tsx}"
   ],
+  // IMPORTANT: Add the NativeWind preset
+  presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
         primary: "#FF5733",
+        secondary: "#FFC300",
+        error: "#EF4444",
+        success: "#10B981",
       },
     },
   },
-  // Make sure this is empty for Tailwind 3.3 with NativeWind
   plugins: [],
-};
+}
