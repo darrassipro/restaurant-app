@@ -3,6 +3,7 @@ import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import ChefStats from '../../components/Chef/ChefStats';
 import KitchenOrderCard from '../../components/Chef/KitchenOrderCard';
 import { useSocket } from '../../hooks/useSocket';
 import { useSound } from '../../hooks/useSound';
@@ -11,19 +12,18 @@ import { useGetRestaurantOrdersQuery, useUpdateOrderStatusMutation } from '../..
 export default function KitchenScreen() {
   const { playSound } = useSound();
   const { isConnected } = useSocket();
-  
   const [activeTab, setActiveTab] = useState<'pending' | 'preparing' | 'ready'>('pending');
   
   const { data: ordersData, isLoading, refetch } = useGetRestaurantOrdersQuery();
   const [updateOrderStatus, { isLoading: isUpdating }] = useUpdateOrderStatusMutation();
-  
+
   const orders = ordersData?.data || [];
-  
+
   // Filter orders by status
   const pendingOrders = orders.filter(order => order.status === 'pending');
   const preparingOrders = orders.filter(order => order.status === 'preparing');
   const readyOrders = orders.filter(order => order.status === 'ready');
-  
+
   let displayOrders = [];
   switch (activeTab) {
     case 'pending':
@@ -52,30 +52,22 @@ export default function KitchenScreen() {
   };
 
   const renderTab = (
-    tabId: 'pending' | 'preparing' | 'ready', 
-    label: string, 
-    count: number, 
+    tabId: 'pending' | 'preparing' | 'ready',
+    label: string,
+    count: number,
     icon: string
   ) => (
     <TouchableOpacity
       onPress={() => setActiveTab(tabId)}
       className={`flex-1 py-3 ${
-        activeTab === tabId 
-          ? 'border-b-2 border-primary' 
-          : 'border-b border-gray-300'
+        activeTab === tabId ? 'border-b-2 border-primary' : 'border-b border-gray-300'
       }`}
     >
       <View className="flex-row justify-center items-center">
-        <Feather 
-          name={icon as any} 
-          size={18} 
-          color={activeTab === tabId ? '#FF5733' : '#666'} 
-        />
+        <Feather name={icon as any} size={18} color={activeTab === tabId ? '#FF5733' : '#666'} />
         <Text
           className={`ml-2 ${
-            activeTab === tabId 
-              ? 'text-primary font-bold' 
-              : 'text-gray-600'
+            activeTab === tabId ? 'text-primary font-bold' : 'text-gray-600'
           }`}
         >
           {label} ({count})
@@ -94,14 +86,23 @@ export default function KitchenScreen() {
           </Text>
         </View>
       )}
-      
+
+      {/* Stats Cards */}
+      <View className="p-4">
+        <ChefStats
+          pendingCount={pendingOrders.length}
+          preparingCount={preparingOrders.length}
+          readyCount={readyOrders.length}
+        />
+      </View>
+
       {/* Tabs */}
       <View className="flex-row bg-white shadow-sm">
         {renderTab('pending', 'En attente', pendingOrders.length, 'clock')}
         {renderTab('preparing', 'En préparation', preparingOrders.length, 'thermometer')}
         {renderTab('ready', 'Prêts', readyOrders.length, 'check-circle')}
       </View>
-      
+
       {/* Order List */}
       {isLoading ? (
         <View className="flex-1 justify-center items-center">
@@ -119,7 +120,6 @@ export default function KitchenScreen() {
               currentTab={activeTab}
             />
           )}
-          
           refreshing={isLoading || isUpdating}
           onRefresh={refetch}
         />
@@ -127,10 +127,12 @@ export default function KitchenScreen() {
         <View className="flex-1 justify-center items-center p-4">
           <Feather name="inbox" size={60} color="#ccc" />
           <Text className="text-lg text-gray-500 mt-4">
-            Aucune commande {
-              activeTab === 'pending' ? 'en attente' : 
-              activeTab === 'preparing' ? 'en préparation' : 'prête'
-            }
+            Aucune commande{' '}
+            {activeTab === 'pending'
+              ? 'en attente'
+              : activeTab === 'preparing'
+              ? 'en préparation'
+              : 'prête'}
           </Text>
         </View>
       )}

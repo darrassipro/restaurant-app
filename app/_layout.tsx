@@ -10,13 +10,10 @@ import { store } from '../store';
 import { useGetCurrentUserQuery } from '../store/api/authApi';
 import { selectIsAuthenticated, selectIsLoading, selectUser, setLoading } from '../store/slices/authSlice';
 
-// Prevent auto-hiding the splash screen
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    // Add any custom fonts here
-  });
+  const [fontsLoaded] = useFonts({});
 
   if (!fontsLoaded) {
     return null;
@@ -64,55 +61,48 @@ function RootLayoutContent() {
     return null;
   }
 
+  // Determine redirect path
+  const getRedirectPath = () => {
+    if (!isAuthenticated) return '/(auth)/login';
+    if (!user) return '/(auth)/login';
+    
+    switch (user.role) {
+      case 'customer':
+        return '/(customer)/home';
+      case 'admin':
+        return '/(admin)/dashboard';
+      case 'manager':
+        return '/(manager)/dashboard';
+      case 'chef':
+        return '/(chef)/kitchen';
+      default:
+        return '/(auth)/login';
+    }
+  };
+
   return (
     <View className="flex-1">
       <StatusBar style="dark" />
-      
       <Stack screenOptions={{ headerShown: false }}>
-        {/* Auth Stack - Always available when not authenticated */}
         {!isAuthenticated ? (
           <>
-            <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/forgot-password" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/otp-verification" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/reset-password" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)/login" />
+            <Stack.Screen name="(auth)/register" />
+            <Stack.Screen name="(auth)/forgot-password" />
+            <Stack.Screen name="(auth)/otp-verification" />
+            <Stack.Screen name="(auth)/reset-password" />
           </>
         ) : (
           <>
-            {/* Role-based routing */}
-            {user?.role === 'customer' && (
-              <Stack.Screen name="(customer)" options={{ headerShown: false }} />
-            )}
-            {user?.role === 'admin' && (
-              <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-            )}
-            {user?.role === 'manager' && (
-              <Stack.Screen name="(manager)" options={{ headerShown: false }} />
-            )}
-            {user?.role === 'chef' && (
-              <Stack.Screen name="(chef)" options={{ headerShown: false }} />
-            )}
+            {user?.role === 'customer' && <Stack.Screen name="(customer)" />}
+            {user?.role === 'admin' && <Stack.Screen name="(admin)" />}
+            {user?.role === 'manager' && <Stack.Screen name="(manager)" />}
+            {user?.role === 'chef' && <Stack.Screen name="(chef)" />}
           </>
         )}
-        
-        {/* Modal and other screens */}
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
-
-      {/* Redirect to login if not authenticated */}
-      {!isAuthenticated && <Redirect href="/(auth)/login" />}
-      
-      {/* Redirect to appropriate home based on role */}
-      {isAuthenticated && user && (
-        <>
-          {user.role === 'customer' && <Redirect href="/(customer)/home" />}
-          {user.role === 'admin' && <Redirect href="/(admin)/dashboard" />}
-          {user.role === 'manager' && <Redirect href="/(manager)/orders" />}
-          {user.role === 'chef' && <Redirect href="/(chef)/kitchen" />}
-        </>
-      )}
+      <Redirect href={getRedirectPath()} />
     </View>
   );
 }

@@ -4,34 +4,10 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useGetRestaurantOrdersQuery } from '../../store/api/orderApi';
+import { Order } from '../../types/order';
 import { ORDER_STATUS } from '../../utils/constants';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
-// Define Order type for better type safety
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
-interface OrderItem {
-  id: number;
-  dishId: number;
-  quantity: number;
-  dishPrice: string;
-}
-
-interface Order {
-  id: number;
-  orderNumber: string;
-  total: string;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
-  createdAt: string;
-  updatedAt: string;
-  User?: User;
-  items?: OrderItem[];
-}
 
 // Define OrderStatus type for type safety
 type OrderStatusKey = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';

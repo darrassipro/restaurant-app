@@ -1,3 +1,4 @@
+// store/slices/cartSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import { Dish } from '../../types/dish';
@@ -28,8 +29,7 @@ const calculateTotals = (state: CartState) => {
   state.total = state.items.reduce((sum, item) => {
     return sum + parseFloat(item.dish.price) * item.quantity;
   }, 0);
-  
-  state.taxAmount = state.total * 0.1; // Assuming 10% tax
+  state.taxAmount = state.total * 0.1; // 10% tax
   state.grandTotal = state.total + state.deliveryFee + state.taxAmount;
 };
 
@@ -37,20 +37,44 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addToCart: (state, action: PayloadAction<{ dish: Dish; quantity: number }>) => {
+    addToCart: (state, action: PayloadAction<{ dish: Partial<Dish> & { id: number; nameFr: string; nameAr: string; price: string; image: string[]; restaurantId: number; categoryId: number }; quantity: number }>) => {
       const { dish, quantity } = action.payload;
       const existingItem = state.items.find(item => item.id === dish.id);
-      
+
       if (existingItem) {
         existingItem.quantity += quantity;
       } else {
+        // Create a complete Dish object with defaults
+        const completeDish: Dish = {
+          id: dish.id,
+          nameFr: dish.nameFr,
+          nameAr: dish.nameAr,
+          price: dish.price,
+          image: dish.image,
+          restaurantId: dish.restaurantId,
+          categoryId: dish.categoryId,
+          descriptionFr: dish.descriptionFr,
+          descriptionAr: dish.descriptionAr,
+          originalPrice: dish.originalPrice,
+          preparationTime: dish.preparationTime,
+          calories: dish.calories,
+          ingredients: dish.ingredients,
+          allergens: dish.allergens,
+          isVegetarian: dish.isVegetarian ?? false,
+          isSpicy: dish.isSpicy ?? false,
+          isPopular: dish.isPopular ?? false,
+          isAvailable: dish.isAvailable ?? true,
+          isActive: dish.isActive ?? true,
+          averageRating: dish.averageRating,
+          totalOrders: dish.totalOrders,
+        };
+
         state.items.push({
           id: dish.id,
-          dish,
+          dish: completeDish,
           quantity,
         });
       }
-      
       calculateTotals(state);
     },
     removeFromCart: (state, action: PayloadAction<number>) => {
@@ -60,11 +84,9 @@ export const cartSlice = createSlice({
     updateQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {
       const { id, quantity } = action.payload;
       const item = state.items.find(item => item.id === id);
-      
       if (item) {
         item.quantity = quantity;
       }
-      
       calculateTotals(state);
     },
     setDeliveryFee: (state, action: PayloadAction<number>) => {
@@ -87,7 +109,7 @@ export const selectCartTotal = (state: RootState) => state.cart.total;
 export const selectDeliveryFee = (state: RootState) => state.cart.deliveryFee;
 export const selectTaxAmount = (state: RootState) => state.cart.taxAmount;
 export const selectGrandTotal = (state: RootState) => state.cart.grandTotal;
-export const selectCartItemCount = (state: RootState) => 
+export const selectCartItemCount = (state: RootState) =>
   state.cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
 export default cartSlice.reducer;

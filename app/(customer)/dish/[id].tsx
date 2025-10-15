@@ -7,29 +7,9 @@ import { useDispatch } from 'react-redux';
 import Button from '../../../components/ui/Button';
 import { useGetDishByIdQuery } from '../../../store/api/dishApi';
 import { addToCart } from '../../../store/slices/cartSlice';
+import { Dish } from '../../../types/dish';
 import { formatCurrency } from '../../../utils/formatters';
 
-// Define Dish interface for type safety
-interface Dish {
-  id: number;
-  nameFr: string;
-  nameAr: string;
-  descriptionFr?: string;
-  price: string;
-  originalPrice?: string;
-  image: string[];
-  isPopular: boolean;
-  isVegetarian: boolean;
-  isSpicy: boolean;
-  averageRating?: string;
-  totalOrders?: number;
-  preparationTime?: number;
-  calories?: number;
-  ingredients?: string[];
-  allergens?: string[];
-  restaurantId: number;
-  categoryId: number;
-}
 
 export default function DishDetailsScreen() {
   const params = useLocalSearchParams();

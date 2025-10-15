@@ -5,7 +5,6 @@ import { Drawer } from 'expo-router/drawer';
 import React from 'react';
 import { ManagerDrawerContent } from '../../components/Manager/ManagerDrawerContent';
 
-// Workaround to make ManagerDrawerContent work with correct types
 const DrawerContent = (props: DrawerContentComponentProps) => (
   <ManagerDrawerContent {...props} />
 );
@@ -25,54 +24,54 @@ export default function ManagerLayout() {
         headerTintColor: '#fff',
       }}
     >
-      <Drawer.Screen 
-        name="dashboard" 
-        options={{ 
+      <Drawer.Screen
+        name="dashboard"
+        options={{
           title: 'Tableau de bord',
           drawerIcon: ({ color }) => <Feather name="home" size={22} color={color} />
-        }} 
+        }}
       />
-      <Drawer.Screen 
-        name="orders" 
-        options={{ 
+      <Drawer.Screen
+        name="orders"
+        options={{
           title: 'Commandes',
           drawerIcon: ({ color }) => <Feather name="shopping-bag" size={22} color={color} />
-        }} 
+        }}
       />
-      <Drawer.Screen 
-        name="kitchen" 
-        options={{ 
+      <Drawer.Screen
+        name="kitchen"
+        options={{
           title: 'Cuisine',
           drawerIcon: ({ color }) => <Feather name="thermometer" size={22} color={color} />
-        }} 
+        }}
       />
-      <Drawer.Screen 
-        name="inventory" 
-        options={{ 
+      <Drawer.Screen
+        name="inventory"
+        options={{
           title: 'Inventaire',
           drawerIcon: ({ color }) => <Feather name="package" size={22} color={color} />
-        }} 
+        }}
       />
-      <Drawer.Screen 
-        name="reports" 
-        options={{ 
+      <Drawer.Screen
+        name="reports"
+        options={{
           title: 'Rapports',
           drawerIcon: ({ color }) => <Feather name="file-text" size={22} color={color} />
-        }} 
+        }}
       />
-      <Drawer.Screen 
-        name="settings" 
-        options={{ 
+      <Drawer.Screen
+        name="settings"
+        options={{
           title: 'Paramètres',
           drawerIcon: ({ color }) => <Feather name="settings" size={22} color={color} />
-        }} 
+        }}
       />
-      <Drawer.Screen 
-        name="order-details/[id]" 
-        options={{ 
+      <Drawer.Screen
+        name="order-details/[id]"
+        options={{
           title: 'Détails de la commande',
-          drawerItemStyle: { display: 'none' } // Hide from drawer menu
-        }} 
+          drawerItemStyle: { display: 'none' }
+        }}
       />
     </Drawer>
   );

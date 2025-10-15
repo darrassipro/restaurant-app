@@ -52,6 +52,11 @@ const DishCard = ({
           image: [image],
           restaurantId,
           categoryId,
+          isPopular: isPopular,
+          isVegetarian: isVegetarian,
+          isSpicy: isSpicy,
+          isAvailable: true,
+          isActive: true,
         },
         quantity: 1,
       })
@@ -81,7 +86,6 @@ const DishCard = ({
             </View>
             <Text className="font-bold text-primary">{price}</Text>
           </View>
-          
           <View className="flex-row justify-between items-center mt-auto pt-2">
             <View className="flex-row">
               {isVegetarian && (
@@ -100,7 +104,6 @@ const DishCard = ({
                 </View>
               )}
             </View>
-            
             <TouchableOpacity
               onPress={handleAddToCart}
               className="bg-primary w-8 h-8 rounded-full items-center justify-center"
@@ -130,12 +133,10 @@ const DishCard = ({
           </View>
         )}
       </View>
-      
       <View className="p-3">
         <Text className="font-medium text-base" numberOfLines={1}>
           {name}
         </Text>
-        
         <View className="flex-row items-center mt-1">
           {rating && (
             <View className="flex-row items-center mr-2">
@@ -143,11 +144,9 @@ const DishCard = ({
               <Text className="text-xs ml-1">{rating}</Text>
             </View>
           )}
-          {/* Changed from "leaf" to "circle" with green color to represent vegetarian */}
           {isVegetarian && <Feather name="circle" size={12} color="green" />}
           {isSpicy && <Feather name="thermometer" size={12} color="red" />}
         </View>
-        
         <View className="flex-row justify-between items-center mt-2">
           <Text className="font-bold text-primary">{price}</Text>
           <TouchableOpacity
