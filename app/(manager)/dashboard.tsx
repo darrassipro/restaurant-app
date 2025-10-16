@@ -10,26 +10,8 @@ import { useGetRestaurantOrdersQuery } from '../../store/api/orderApi';
 export default function ManagerDashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
   
-  const { data: ordersData, refetch: refetchOrders } = useGetRestaurantOrdersQuery();
-  const { data: inventoryData, refetch: refetchInventory } = useGetLowStockInventoryQuery();
-
-  const orders = ordersData?.data || [];
-  const lowStockItems = inventoryData?.data || [];
-
-  // Calculate today's orders
-  const today = new Date().toISOString().split('T')[0];
-  const todaysOrders = orders.filter(order => order.createdAt.startsWith(today));
-  const todaysRevenue = todaysOrders.reduce((sum, order) => sum + parseFloat(order.total), 0);
-
-  // Group orders by status
-  const ordersByStatus = {
-    pending: orders.filter(order => order.status === 'pending').length,
-    confirmed: orders.filter(order => order.status === 'confirmed').length,
-    preparing: orders.filter(order => order.status === 'preparing').length,
-    ready: orders.filter(order => order.status === 'ready').length,
-    delivered: orders.filter(order => order.status === 'delivered').length,
-    cancelled: orders.filter(order => order.status === 'cancelled').length,
-  };
+  const { refetch: refetchOrders } = useGetRestaurantOrdersQuery();
+  const { refetch: refetchInventory } = useGetLowStockInventoryQuery();
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -50,16 +32,13 @@ export default function ManagerDashboardScreen() {
         </Text>
 
         {/* Today's Sales */}
-        <TodaysSales
-          orderCount={todaysOrders.length}
-          revenue={todaysRevenue}
-        />
+        <TodaysSales />
 
         {/* Orders Overview */}
-        <OrdersOverview ordersByStatus={ordersByStatus} />
+        <OrdersOverview />
 
         {/* Inventory Status */}
-        <InventoryStatus lowStockItems={lowStockItems} />
+        <InventoryStatus />
       </View>
     </ScrollView>
   );

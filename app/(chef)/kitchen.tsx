@@ -7,7 +7,7 @@ import ChefStats from '../../components/Chef/ChefStats';
 import KitchenOrderCard from '../../components/Chef/KitchenOrderCard';
 import { useSocket } from '../../hooks/useSocket';
 import { useSound } from '../../hooks/useSound';
-import { useGetRestaurantOrdersQuery, useUpdateOrderStatusMutation } from '../../store/api/orderApi';
+import { useGetRestaurantOrdersQuery } from '../../store/api/orderApi';
 
 export default function KitchenScreen() {
   const { playSound } = useSound();
@@ -15,8 +15,7 @@ export default function KitchenScreen() {
   const [activeTab, setActiveTab] = useState<'pending' | 'preparing' | 'ready'>('pending');
   
   const { data: ordersData, isLoading, refetch } = useGetRestaurantOrdersQuery();
-  const [updateOrderStatus, { isLoading: isUpdating }] = useUpdateOrderStatusMutation();
-
+  
   const orders = ordersData?.data || [];
 
   // Filter orders by status
@@ -37,18 +36,13 @@ export default function KitchenScreen() {
       break;
   }
 
-  const handleUpdateStatus = async (orderId: number, newStatus: 'confirmed' | 'preparing' | 'ready') => {
-    try {
-      await updateOrderStatus({ id: orderId, newStatus }).unwrap();
-      playSound('notification');
-      refetch();
-    } catch (error) {
-      console.error('Update status error:', error);
-    }
-  };
-
   const handleViewOrder = (orderId: number) => {
     router.push(`/chef/order-details/${orderId}` as never);
+  };
+
+  const handleUpdateSuccess = () => {
+    playSound('notification');
+    refetch();
   };
 
   const renderTab = (
@@ -115,12 +109,12 @@ export default function KitchenScreen() {
           renderItem={({ item }) => (
             <KitchenOrderCard
               order={item}
-              onViewDetails={() => handleViewOrder(item.id)}
-              onUpdateStatus={(status) => handleUpdateStatus(item.id, status)}
+              onViewDetails={handleViewOrder}
+              onUpdateSuccess={handleUpdateSuccess}
               currentTab={activeTab}
             />
           )}
-          refreshing={isLoading || isUpdating}
+          refreshing={isLoading}
           onRefresh={refetch}
         />
       ) : (

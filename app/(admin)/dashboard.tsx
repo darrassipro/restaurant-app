@@ -12,17 +12,14 @@ import { useGetUsersQuery } from '../../store/api/userApi';
 export default function AdminDashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
   
-  const { data: usersData, refetch: refetchUsers } = useGetUsersQuery({ page: 1, limit: 1 });
+  const { data: usersData, refetch: refetchUsers, isLoading: loadingUsers } = useGetUsersQuery({ page: 1, limit: 1 });
   const { data: restaurantData, refetch: refetchRestaurant } = useGetRestaurantQuery();
-  const { data: ordersData, refetch: refetchOrders } = useGetOrdersQuery();
-  const { data: dishesData, refetch: refetchDishes } = useGetDishesQuery({ page: 1, limit: 1 });
+  const { data: ordersData, refetch: refetchOrders, isLoading: loadingOrders } = useGetOrdersQuery();
+  const { data: dishesData, refetch: refetchDishes, isLoading: loadingDishes } = useGetDishesQuery({ page: 1, limit: 1 });
   
   const totalUsers = usersData?.data?.pagination?.total || 0;
   const totalDishes = dishesData?.pagination?.totalDishes || 0;
   const orders = ordersData?.data || [];
-  
-  // Calculate total revenue
-  const totalRevenue = orders.reduce((sum, order) => sum + parseFloat(order.total), 0);
   
   // Calculate today's orders
   const today = new Date().toISOString().split('T')[0];
@@ -39,24 +36,6 @@ export default function AdminDashboardScreen() {
     ]);
     setRefreshing(false);
   };
-  
-  // Prepare data for chart
-  const salesData = React.useMemo(() => {
-    // Group orders by date and calculate daily totals
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      return date.toISOString().split('T')[0];
-    }).reverse();
-    
-    const dailyTotals = last7Days.map(date => {
-      const dailyOrders = orders.filter(order => order.createdAt.startsWith(date));
-      const total = dailyOrders.reduce((sum, order) => sum + parseFloat(order.total), 0);
-      return { date, total };
-    });
-    
-    return dailyTotals;
-  }, [orders]);
 
   return (
     <ScrollView 
@@ -79,6 +58,7 @@ export default function AdminDashboardScreen() {
             iconColor="#3B82F6"
             iconBgColor="#EFF6FF"
             className="w-[48%]"
+            loading={loadingOrders}
           />
           
           <StatsCard
@@ -88,6 +68,7 @@ export default function AdminDashboardScreen() {
             iconColor="#10B981"
             iconBgColor="#ECFDF5"
             className="w-[48%]"
+            loading={loadingOrders}
           />
           
           <StatsCard
@@ -97,6 +78,7 @@ export default function AdminDashboardScreen() {
             iconColor="#F59E0B"
             iconBgColor="#FFFBEB"
             className="w-[48%] mt-4"
+            loading={loadingUsers}
           />
           
           <StatsCard
@@ -106,17 +88,17 @@ export default function AdminDashboardScreen() {
             iconColor="#6366F1"
             iconBgColor="#EEF2FF"
             className="w-[48%] mt-4"
+            loading={loadingDishes}
           />
         </View>
 
         {/* Sales Chart */}
         <View className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <Text className="text-lg font-bold mb-4">Ventes des 7 derniers jours</Text>
-          <SalesChart data={salesData} />
+          <SalesChart />
         </View>
 
         {/* Recent Orders */}
-        <RecentOrders orders={orders.slice(0, 5)} />
+        <RecentOrders />
       </View>
     </ScrollView>
   );
