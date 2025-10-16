@@ -1,4 +1,3 @@
-// app/(customer)/add-edit-address.tsx
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -16,8 +15,8 @@ export default function AddEditAddressScreen() {
     city: '',
     sector: '',
     addressName: '',
-    latitude: '',
-    longitude: '',
+    latitude: '',  
+    longitude: '', 
     isDefault: false,
     deliveryInstructions: '',
     contactName: '',
@@ -39,8 +38,8 @@ export default function AddEditAddressScreen() {
         city: addressData.city || '',
         sector: addressData.sector || '',
         addressName: addressData.addressName || '',
-        latitude: addressData.latitude || '',
-        longitude: addressData.longitude || '',
+        latitude: addressData.latitude || '', 
+        longitude: addressData.longitude || '', 
         isDefault: addressData.isDefault || false,
         deliveryInstructions: addressData.deliveryInstructions || '',
         contactName: addressData.contactName || '',
@@ -68,21 +67,39 @@ export default function AddEditAddressScreen() {
     if (!validateForm()) return;
 
     try {
+      // Create a clean version of formData with proper types for latitude/longitude
+      const cleanedData = {
+        ...formData,
+        // Convert empty strings to null for latitude/longitude
+        latitude: formData.latitude || null,
+        longitude: formData.longitude || null
+      };
+      
       if (isEditMode && addressId) {
-        await updateAddress({ id: addressId, address: formData as Address }).unwrap();
+        await updateAddress({ id: addressId, address: cleanedData as Address }).unwrap();
         Alert.alert('Succès', 'Adresse mise à jour avec succès');
       } else {
-        await createAddress(formData as Address).unwrap();
+        await createAddress(cleanedData as Address).unwrap();
         Alert.alert('Succès', 'Adresse ajoutée avec succès');
       }
       router.back();
     } catch (error) {
-      Alert.alert('Erreur', "Une erreur est survenue");
+      console.error('Error submitting address:', error);
+      Alert.alert('Erreur', "Une erreur est survenue lors de l'enregistrement de l'adresse");
     }
   };
 
   const handleInputChange = (field: keyof Address, value: string | boolean) => {
-    setFormData({ ...formData, [field]: value });
+    // Special handling for latitude and longitude
+    if (field === 'latitude' || field === 'longitude') {
+      // If it's an empty string, set to null
+      // If it's a valid number string, keep it as is
+      const numValue = value === '' ? null : value;
+      setFormData({ ...formData, [field]: numValue });
+    } else {
+      setFormData({ ...formData, [field]: value });
+    }
+    
     if (errors[field]) {
       setErrors({ ...errors, [field]: '' });
     }
