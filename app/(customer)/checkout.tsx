@@ -1,4 +1,3 @@
-// app/(customer)/checkout.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -7,16 +6,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import AddressSelector from '../../components/features/AddressSelector';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { useGetAddressesQuery } from '../../store/api/addressApi';
 import { useCreateOrderMutation } from '../../store/api/orderApi';
 import { useGetRestaurantQuery } from '../../store/api/restaurantApi';
 import {
-    clearCart,
-    selectCartItems,
-    selectCartTotal,
-    selectDeliveryFee,
-    selectGrandTotal,
-    selectTaxAmount,
-    setDeliveryFee,
+  clearCart,
+  selectCartItems,
+  selectCartTotal,
+  selectDeliveryFee,
+  selectGrandTotal,
+  selectTaxAmount,
+  setDeliveryFee,
 } from '../../store/slices/cartSlice';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -28,12 +28,17 @@ export default function CheckoutScreen() {
   const taxAmount = useSelector(selectTaxAmount);
   const grandTotal = useSelector(selectGrandTotal);
 
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  const { data: addresses } = useGetAddressesQuery();
+  const defaultAddress = addresses?.find(addr => addr.isDefault);
+
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(defaultAddress?.id ?? null);
   const [notes, setNotes] = useState('');
   const [paymentMethod] = useState<'cod'>('cod');
 
   const { data: restaurantData } = useGetRestaurantQuery();
   const [createOrder, { isLoading }] = useCreateOrderMutation();
+
+  const selectedAddress = addresses?.find(addr => addr.id === selectedAddressId);
 
   useEffect(() => {
     if (restaurantData?.deliveryFee) {
@@ -91,29 +96,36 @@ export default function CheckoutScreen() {
     <View className="flex-1 bg-gray-50">
       <ScrollView className="flex-1">
         <View className="p-4">
+          {/* Address Selector */}
           <AddressSelector
             selectedAddressId={selectedAddressId}
             onSelectAddress={(address) => setSelectedAddressId(address.id ?? null)}
           />
 
+          {/* Order Summary */}
           <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <Text className="text-lg font-bold mb-3">Votre commande</Text>
-            {cartItems.map((item) => (
-              <View
-                key={item.id}
-                className="flex-row justify-between items-center py-2 border-b border-gray-100"
-              >
-                <View className="flex-row items-center">
-                  <Text className="text-gray-800 font-medium">{item.quantity} x</Text>
-                  <Text className="ml-2">{item.dish.nameFr}</Text>
+            {cartItems.length > 0 ? (
+              cartItems.map((item) => (
+                <View
+                  key={item.id}
+                  className="flex-row justify-between items-center py-2 border-b border-gray-100"
+                >
+                  <View className="flex-row items-center">
+                    <Text className="text-gray-800 font-medium">{item.quantity} x</Text>
+                    <Text className="ml-2">{item.dish.nameFr}</Text>
+                  </View>
+                  <Text className="font-medium">
+                    {formatCurrency(parseFloat(item.dish.price) * item.quantity)}
+                  </Text>
                 </View>
-                <Text className="font-medium">
-                  {formatCurrency(parseFloat(item.dish.price) * item.quantity)}
-                </Text>
-              </View>
-            ))}
+              ))
+            ) : (
+              <Text className="text-gray-500">Aucun plat dans le panier</Text>
+            )}
           </View>
 
+          {/* Payment Method */}
           <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <Text className="text-lg font-bold mb-3">Mode de paiement</Text>
             <TouchableOpacity
@@ -129,6 +141,7 @@ export default function CheckoutScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Notes */}
           <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <Text className="text-lg font-bold mb-3">Notes de commande</Text>
             <Input
@@ -140,7 +153,16 @@ export default function CheckoutScreen() {
             />
           </View>
 
+          {/* Order Totals */}
           <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
+            {selectedAddress && (
+              <View className="mb-3">
+                <Text className="text-gray-700 font-medium mb-1">Adresse de livraison</Text>
+                <Text className="text-gray-800">{selectedAddress.contactName}</Text>
+                <Text className="text-gray-800">{selectedAddress.addressName}, {selectedAddress.sector}, {selectedAddress.city}</Text>
+                <Text className="text-gray-800">{selectedAddress.contactPhone}</Text>
+              </View>
+            )}
             <Text className="text-lg font-bold mb-3">Récapitulatif</Text>
             <View className="flex-row justify-between mb-2">
               <Text className="text-gray-600">Sous-total</Text>

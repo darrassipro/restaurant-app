@@ -1,4 +1,3 @@
-// components/features/AddressSelector.tsx
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -16,8 +15,7 @@ interface AddressSelectorProps {
 const AddressSelector = ({ selectedAddressId, onSelectAddress }: AddressSelectorProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { data: addresses, isLoading } = useGetAddressesQuery();
-  
-  // Fixed: addresses is now the transformed array directly
+
   const selectedAddress = addresses?.find(address => address.id === selectedAddressId);
 
   const handleAddNewAddress = () => {

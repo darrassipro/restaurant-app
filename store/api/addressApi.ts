@@ -6,12 +6,14 @@ export const addressApi = apiSlice.injectEndpoints({
     getAddresses: builder.query<Address[], void>({
       query: () => '/addresses',
       providesTags: ['Address'],
-      transformResponse: (response: { status: boolean; data: Address[] }) => response.data,
+      // backend returns an array directly: res.status(200).json(addresses)
+      transformResponse: (response: any) => response,
     }),
     getAddressById: builder.query<Address, number>({
       query: (id) => `/addresses/${id}`,
       providesTags: (result, error, id) => [{ type: 'Address', id }],
-      transformResponse: (response: { status: boolean; data: Address }) => response.data,
+      // backend returns the address object directly
+      transformResponse: (response: any) => response,
     }),
     createAddress: builder.mutation<Address, Partial<Address>>({
       query: (address) => ({
@@ -20,7 +22,8 @@ export const addressApi = apiSlice.injectEndpoints({
         body: address,
       }),
       invalidatesTags: ['Address'],
-      transformResponse: (response: { status: boolean; message: string; data: Address }) => response.data,
+      // backend returns { message: '...', address: newAddress }
+      transformResponse: (response: any) => response?.address ?? response,
     }),
     updateAddress: builder.mutation<Address, { id: number; address: Partial<Address> }>({
       query: ({ id, address }) => ({
@@ -29,7 +32,8 @@ export const addressApi = apiSlice.injectEndpoints({
         body: address,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Address', id }, 'Address'],
-      transformResponse: (response: { status: boolean; message: string; data: Address }) => response.data,
+      // backend returns { message: '...', address: updatedAddress }
+      transformResponse: (response: any) => response?.address ?? response,
     }),
     deleteAddress: builder.mutation<{ message: string }, number>({
       query: (id) => ({
@@ -37,6 +41,8 @@ export const addressApi = apiSlice.injectEndpoints({
         method: 'DELETE',
       }),
       invalidatesTags: ['Address'],
+      // backend returns { message: '...' }
+      transformResponse: (response: any) => response,
     }),
   }),
 });

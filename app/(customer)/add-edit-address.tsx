@@ -15,8 +15,8 @@ export default function AddEditAddressScreen() {
     city: '',
     sector: '',
     addressName: '',
-    latitude: '',  
-    longitude: '', 
+    latitude: '',    // keep as string to satisfy TS
+    longitude: '',   // keep as string to satisfy TS
     isDefault: false,
     deliveryInstructions: '',
     contactName: '',
@@ -38,8 +38,8 @@ export default function AddEditAddressScreen() {
         city: addressData.city || '',
         sector: addressData.sector || '',
         addressName: addressData.addressName || '',
-        latitude: addressData.latitude || '', 
-        longitude: addressData.longitude || '', 
+        latitude: addressData.latitude !== undefined && addressData.latitude !== null ? String(addressData.latitude) : '', // as string
+        longitude: addressData.longitude !== undefined && addressData.longitude !== null ? String(addressData.longitude) : '', // as string
         isDefault: addressData.isDefault || false,
         deliveryInstructions: addressData.deliveryInstructions || '',
         contactName: addressData.contactName || '',
@@ -56,7 +56,7 @@ export default function AddEditAddressScreen() {
     if (!formData.contactName?.trim()) newErrors.contactName = 'Le nom de contact est requis';
     if (!formData.contactPhone?.trim()) {
       newErrors.contactPhone = 'Le téléphone de contact est requis';
-    } else if (!/^\+?\d{10,15}$/.test(formData.contactPhone.replace(/\s/g, ''))) {
+    } else if (!/^\+?\d{10,15}$/.test((formData.contactPhone || '').replace(/\s/g, ''))) {
       newErrors.contactPhone = 'Format de téléphone invalide';
     }
     setErrors(newErrors);
@@ -67,39 +67,47 @@ export default function AddEditAddressScreen() {
     if (!validateForm()) return;
 
     try {
-      // Create a clean version of formData with proper types for latitude/longitude
-      const cleanedData = {
-        ...formData,
-        // Convert empty strings to null for latitude/longitude
-        latitude: formData.latitude || null,
-        longitude: formData.longitude || null
+      // Clean and convert lat/long: send numbers (parseFloat) or undefined (so backend can handle null)
+      const cleanedData: any = {
+        city: formData.city,
+        sector: formData.sector,
+        addressName: formData.addressName,
+        isDefault: !!formData.isDefault,
+        deliveryInstructions: formData.deliveryInstructions,
+        contactName: formData.contactName,
+        contactPhone: formData.contactPhone,
       };
-      
+
+      if (typeof formData.latitude === 'string' && formData.latitude.trim() !== '') {
+        const lat = parseFloat(formData.latitude);
+        if (!isNaN(lat)) cleanedData.latitude = lat;
+      }
+      if (typeof formData.longitude === 'string' && formData.longitude.trim() !== '') {
+        const lng = parseFloat(formData.longitude);
+        if (!isNaN(lng)) cleanedData.longitude = lng;
+      }
+
+      // If no lat/lng provided, they remain undefined (DB allows null)
       if (isEditMode && addressId) {
-        await updateAddress({ id: addressId, address: cleanedData as Address }).unwrap();
+        await updateAddress({ id: addressId, address: cleanedData }).unwrap();
         Alert.alert('Succès', 'Adresse mise à jour avec succès');
       } else {
-        await createAddress(cleanedData as Address).unwrap();
+        await createAddress(cleanedData).unwrap();
         Alert.alert('Succès', 'Adresse ajoutée avec succès');
       }
       router.back();
-    } catch (error) {
-      console.error('Error submitting address:', error);
-      Alert.alert('Erreur', "Une erreur est survenue lors de l'enregistrement de l'adresse");
+    } catch (err: any) {
+      console.error('Address submit error:', err);
+      // RTK Query returns error.data when server responded with JSON; show it if present
+      const serverMsg = err?.data?.message || err?.data || err?.error || 'Une erreur est survenue';
+      // If validation details exist, show them too
+      const details = err?.data?.details ? JSON.stringify(err.data.details) : null;
+      Alert.alert('Erreur', details ? `${serverMsg}\n${details}` : String(serverMsg));
     }
   };
 
   const handleInputChange = (field: keyof Address, value: string | boolean) => {
-    // Special handling for latitude and longitude
-    if (field === 'latitude' || field === 'longitude') {
-      // If it's an empty string, set to null
-      // If it's a valid number string, keep it as is
-      const numValue = value === '' ? null : value;
-      setFormData({ ...formData, [field]: numValue });
-    } else {
-      setFormData({ ...formData, [field]: value });
-    }
-    
+    setFormData({ ...formData, [field]: value });
     if (errors[field]) {
       setErrors({ ...errors, [field]: '' });
     }
@@ -147,6 +155,20 @@ export default function AddEditAddressScreen() {
             onChangeText={(value) => handleInputChange('contactPhone', value)}
             keyboardType="phone-pad"
             error={errors.contactPhone}
+          />
+          <Input
+            label="Latitude"
+            placeholder="33.5423"
+            value={formData.latitude as string}
+            onChangeText={(value) => handleInputChange('latitude', value)}
+            keyboardType="numeric"
+          />
+          <Input
+            label="Longitude"
+            placeholder="-7.5898"
+            value={formData.longitude as string}
+            onChangeText={(value) => handleInputChange('longitude', value)}
+            keyboardType="numeric"
           />
           <Input
             label="Instructions de livraison"

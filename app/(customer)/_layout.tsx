@@ -1,6 +1,7 @@
 // app/(customer)/_layout.tsx
 import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import Toast from 'react-native-toast-message';
 
 export default function CustomerTabLayout() {
   return (
@@ -39,12 +40,21 @@ export default function CustomerTabLayout() {
         }}
       />
       {/* Hide these from tab bar */}
+      <Tabs.Screen name="checkout" options={{ href: null }} />
+      <Tabs.Screen name="add-edit-address" options={{ href: null }} />
+      <Tabs.Screen name="address-book" options={{ href: null }} />
+      <Tabs.Screen name="edit-profile" options={{ href: null }} />
+      <Tabs.Screen name="order-history" options={{ href: null }} />
+      <Tabs.Screen name="dish/[id]" options={{ href: null }} />
+      <Tabs.Screen name="order-details/[id]" options={{ href: null }} />
+      <Tabs.Screen name="order-success" options={{ href: null }} />
       <Tabs.Screen
         name="dish"
         options={{
           href: null,
         }}
       />
+      <Toast />
     </Tabs>
   );
 }
